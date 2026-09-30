@@ -48,6 +48,56 @@ export async function getCharacters(
   return response.json();
 }
 
+async function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(
+  url: string,
+  retries = 3
+): Promise<Response> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetchWithRetry(url);
+
+      if (response.ok) {
+        return response;
+      }
+
+      // Errores 4xx normales no tiene sentido repetirlos,
+      // excepto 429 (demasiadas solicitudes).
+      if (
+        response.status >= 400 &&
+        response.status < 500 &&
+        response.status !== 429
+      ) {
+        throw new Error(
+          `Error HTTP ${response.status}`
+        );
+      }
+
+      lastError = new Error(
+        `Error HTTP ${response.status}`
+      );
+    } catch (error) {
+      lastError = error;
+    }
+
+    if (attempt < retries) {
+      // Esperamos un poco más en cada intento.
+      await wait(500 * (attempt + 1));
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(
+        "No se pudo conectar con la API"
+      );
+}
+
 export async function getCharacterById(
   id: string | number
 ): Promise<Character> {
