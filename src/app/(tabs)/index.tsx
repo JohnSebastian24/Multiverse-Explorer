@@ -1,47 +1,257 @@
-import { useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useScrollToTop } from "expo-router/react-navigation";
+import { Href, useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import {
-  Character,
-  getCharacters,
+    Character,
+    getCharacters,
 } from "../../services/rickAndMortyApi";
 
-import { Href, useRouter } from "expo-router";
+import {
+    translateSpecies,
+    translateStatus,
+} from "../../utils/translations";
 
 export default function HomeScreen() {
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const router = useRouter();
 
-  async function loadCharacters() {
+  // Referencia directa a la lista.
+  const listRef = useRef<FlatList<Character>>(null);
+
+  useScrollToTop(listRef);
+
+  // Bloqueo inmediato para evitar peticiones duplicadas
+  // cuando se hace scroll muy rápido.
+  const loadingMoreRef = useRef(false);
+
+  // Guarda el filtro que realmente está activo.
+  const activeFilterRef = useRef("");
+
+  // Al volver a pulsar la pestaña Inicio,
+  // React Navigation intentará llevar la lista arriba.
+  useScrollToTop(listRef);
+
+  const [characters, setCharacters] = useState<Character[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const [error, setError] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  async function loadCharacters(
+    pageToLoad = 1,
+    status = activeFilterRef.current
+  ) {
+    const isFirstPage = pageToLoad === 1;
+
+    // Esta comprobación es inmediata.
+    // A diferencia del state, useRef cambia al instante.
+    if (!isFirstPage && loadingMoreRef.current) {
+      return;
+    }
+
+    if (!isFirstPage && !hasMore) {
+      return;
+    }
+
+    const requestedFilter = status;
+
     try {
-      setLoading(true);
-      setError(false);
+      if (isFirstPage) {
+        setLoading(true);
+        setError(false);
+      } else {
+        loadingMoreRef.current = true;
 
-      const data = await getCharacters();
+        setLoadingMore(true);
+        setLoadMoreError(false);
+      }
 
-      setCharacters(data.results);
+      const data = await getCharacters(
+        pageToLoad,
+        requestedFilter || undefined
+      );
+
+      /*
+       * Si el usuario cambió de filtro mientras
+       * esta petición estaba viajando por internet,
+       * ignoramos la respuesta vieja.
+       */
+      if (
+        requestedFilter !== activeFilterRef.current
+      ) {
+        return;
+      }
+
+      if (isFirstPage) {
+        setCharacters(data.results);
+      } else {
+        /*
+         * Además evitamos personajes duplicados
+         * si alguna petición llegara repetida.
+         */
+        setCharacters((current) => {
+          const existingIds = new Set(
+            current.map((character) => character.id)
+          );
+
+          const newCharacters =
+            data.results.filter(
+              (character) =>
+                !existingIds.has(character.id)
+            );
+
+          return [
+            ...current,
+            ...newCharacters,
+          ];
+        });
+      }
+
+      setPage(pageToLoad);
+
+      setHasMore(
+        data.info.next !== null
+      );
     } catch (err) {
-      console.error(err);
-      setError(true);
+      /*
+       * Si mientras tanto cambiamos de filtro,
+       * ignoramos errores de la petición anterior.
+       */
+      if (
+        requestedFilter !== activeFilterRef.current
+      ) {
+        return;
+      }
+
+      if (isFirstPage) {
+        setError(true);
+      } else {
+        /*
+         * Un error cargando la página 5 o 6
+         * NO debe convertir toda la aplicación
+         * en una pantalla de error.
+         */
+        setLoadMoreError(true);
+      }
+
+      /*
+       * Usamos log y no console.error.
+       * Expo Go mostraba el cuadro rojo porque
+       * console.error es visible durante desarrollo.
+       */
+      if (__DEV__) {
+        console.log(
+          "No se pudo completar la petición:",
+          err
+        );
+      }
     } finally {
-      setLoading(false);
+      if (
+        requestedFilter === activeFilterRef.current
+      ) {
+        if (isFirstPage) {
+          setLoading(false);
+        } else {
+          setLoadingMore(false);
+        }
+      }
+
+      if (!isFirstPage) {
+        loadingMoreRef.current = false;
+      }
     }
   }
 
   useEffect(() => {
-    loadCharacters();
+    activeFilterRef.current = "";
+
+    loadCharacters(1, "");
   }, []);
+
+  function handleFilter(status: string) {
+    /*
+     * Cambiamos el ref ANTES de enviar la petición.
+     * Esto permite invalidar peticiones anteriores.
+     */
+    activeFilterRef.current = status;
+
+    setStatusFilter(status);
+
+    setCharacters([]);
+
+    setPage(1);
+    setHasMore(true);
+
+    setError(false);
+    setLoadMoreError(false);
+
+    loadCharacters(1, status);
+  }
+
+  function loadMoreCharacters() {
+    if (
+      loading ||
+      loadingMore ||
+      loadingMoreRef.current ||
+      !hasMore ||
+      loadMoreError
+    ) {
+      return;
+    }
+
+    loadCharacters(
+      page + 1,
+      activeFilterRef.current
+    );
+  }
+
+  function scrollToTop() {
+    listRef.current?.scrollToOffset({
+      offset: 0,
+      animated: true,
+    });
+  }
+
+  function handleScroll(
+    event: NativeSyntheticEvent<NativeScrollEvent>
+  ) {
+    const offset =
+      event.nativeEvent.contentOffset.y;
+
+    const shouldShow = offset > 600;
+
+    setShowScrollTop((current) => {
+      if (current === shouldShow) {
+        return current;
+      }
+
+      return shouldShow;
+    });
+  }
 
   if (loading) {
     return (
@@ -61,7 +271,9 @@ export default function HomeScreen() {
   if (error) {
     return (
       <View style={styles.center}>
-        <Text style={styles.errorIcon}>🛸</Text>
+        <Text style={styles.errorIcon}>
+          🛸
+        </Text>
 
         <Text style={styles.errorTitle}>
           No pudimos conectar con esta dimensión
@@ -73,9 +285,16 @@ export default function HomeScreen() {
 
         <Pressable
           style={styles.retryButton}
-          onPress={loadCharacters}
+          onPress={() =>
+            loadCharacters(
+              1,
+              activeFilterRef.current
+            )
+          }
         >
-          <Text style={styles.retryButtonText}>
+          <Text
+            style={styles.retryButtonText}
+          >
             Intentar nuevamente
           </Text>
         </Pressable>
@@ -86,16 +305,27 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
+        ref={listRef}
         data={characters}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) =>
+          item.id.toString()
+        }
         numColumns={2}
         columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={
+          styles.listContent
+        }
         showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        onEndReached={
+          loadMoreCharacters
+        }
+        onEndReachedThreshold={0.35}
         ListHeaderComponent={
           <View style={styles.header}>
             <Text style={styles.badge}>
-              MULTIVERSE DATABASE
+              BASE DE DATOS MULTIVERSAL
             </Text>
 
             <Text style={styles.title}>
@@ -103,62 +333,243 @@ export default function HomeScreen() {
             </Text>
 
             <Text style={styles.subtitle}>
-              Explorer
+              Explorador
             </Text>
 
-            <Text style={styles.description}>
+            <Text
+              style={styles.description}
+            >
               Explora personajes de todas las dimensiones.
             </Text>
+
+            <View
+              style={styles.filters}
+            >
+              <FilterButton
+                label="Todos"
+                active={
+                  statusFilter === ""
+                }
+                onPress={() =>
+                  handleFilter("")
+                }
+              />
+
+              <FilterButton
+                label="Vivos"
+                active={
+                  statusFilter ===
+                  "alive"
+                }
+                onPress={() =>
+                  handleFilter(
+                    "alive"
+                  )
+                }
+              />
+
+              <FilterButton
+                label="Muertos"
+                active={
+                  statusFilter ===
+                  "dead"
+                }
+                onPress={() =>
+                  handleFilter(
+                    "dead"
+                  )
+                }
+              />
+
+              <FilterButton
+                label="Desconocidos"
+                active={
+                  statusFilter ===
+                  "unknown"
+                }
+                onPress={() =>
+                  handleFilter(
+                    "unknown"
+                  )
+                }
+              />
+            </View>
           </View>
         }
+        ListFooterComponent={
+          loadingMore ? (
+            <View
+              style={styles.footerLoader}
+            >
+              <ActivityIndicator
+                size="small"
+                color="#97ce4c"
+              />
+
+              <Text
+                style={styles.footerText}
+              >
+                Explorando otra dimensión...
+              </Text>
+            </View>
+          ) : loadMoreError ? (
+            <View
+              style={
+                styles.loadMoreErrorContainer
+              }
+            >
+              <Text
+                style={
+                  styles.loadMoreErrorText
+                }
+              >
+                El portal perdió la conexión.
+              </Text>
+
+              <Pressable
+                style={
+                  styles.loadMoreRetryButton
+                }
+                onPress={() => {
+                  setLoadMoreError(false);
+
+                  loadCharacters(
+                    page + 1,
+                    activeFilterRef.current
+                  );
+                }}
+              >
+                <Text
+                  style={
+                    styles.loadMoreRetryText
+                  }
+                >
+                  Reintentar
+                </Text>
+              </Pressable>
+            </View>
+          ) : null
+        }
         renderItem={({ item }) => (
-         <Pressable
-  style={styles.card}
-  onPress={() =>
-    router.push(`/character/${item.id}` as Href)
-  }
->
+          <Pressable
+            style={styles.card}
+            onPress={() =>
+              router.push(
+                `/character/${item.id}` as Href
+              )
+            }
+          >
             <Image
-              source={{ uri: item.image }}
-              style={styles.characterImage}
+              source={{
+                uri: item.image,
+              }}
+              style={
+                styles.characterImage
+              }
             />
 
-            <View style={styles.cardContent}>
+            <View
+              style={styles.cardContent}
+            >
               <Text
-                style={styles.characterName}
+                style={
+                  styles.characterName
+                }
                 numberOfLines={1}
               >
                 {item.name}
               </Text>
 
-              <View style={styles.statusContainer}>
+              <View
+                style={
+                  styles.statusContainer
+                }
+              >
                 <View
                   style={[
                     styles.statusDot,
                     {
                       backgroundColor:
-                        item.status === "Alive"
+                        item.status ===
+                        "Alive"
                           ? "#97ce4c"
-                          : item.status === "Dead"
+                          : item.status ===
+                            "Dead"
                           ? "#ef4444"
                           : "#9ca3af",
                     },
                   ]}
                 />
 
-                <Text style={styles.statusText}>
-                  {item.status}
+                <Text
+                  style={
+                    styles.statusText
+                  }
+                >
+                  {translateStatus(
+                    item.status
+                  )}
                 </Text>
               </View>
 
-              <Text style={styles.species}>
-                {item.species}
+              <Text
+                style={styles.species}
+              >
+                {translateSpecies(
+                  item.species
+                )}
               </Text>
             </View>
           </Pressable>
         )}
       />
+
+      {showScrollTop && (
+        <Pressable
+          style={styles.scrollTopButton}
+          onPress={scrollToTop}
+        >
+          <Ionicons
+            name="arrow-up"
+            size={25}
+            color="#090e17"
+          />
+        </Pressable>
+      )}
     </SafeAreaView>
+  );
+}
+
+interface FilterButtonProps {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}
+
+function FilterButton({
+  label,
+  active,
+  onPress,
+}: FilterButtonProps) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.filterButton,
+        active &&
+          styles.filterButtonActive,
+      ]}
+    >
+      <Text
+        style={[
+          styles.filterText,
+          active &&
+            styles.filterTextActive,
+        ]}
+      >
+        {label}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -218,11 +629,11 @@ const styles = StyleSheet.create({
 
   listContent: {
     paddingHorizontal: 16,
-    paddingBottom: 30,
+    paddingBottom: 100,
   },
 
   header: {
-    paddingTop: 35,
+    paddingTop: 25,
     paddingBottom: 24,
   },
 
@@ -253,6 +664,37 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 
+  filters: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 20,
+  },
+
+  filterButton: {
+    backgroundColor: "#111827",
+    borderWidth: 1,
+    borderColor: "#1f2937",
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 20,
+  },
+
+  filterButtonActive: {
+    backgroundColor: "#97ce4c",
+    borderColor: "#97ce4c",
+  },
+
+  filterText: {
+    color: "#9ca3af",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
+  filterTextActive: {
+    color: "#090e17",
+  },
+
   row: {
     justifyContent: "space-between",
   },
@@ -270,6 +712,7 @@ const styles = StyleSheet.create({
   characterImage: {
     width: "100%",
     aspectRatio: 1,
+    backgroundColor: "#172033",
   },
 
   cardContent: {
@@ -304,5 +747,67 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     fontSize: 12,
     marginTop: 4,
+  },
+
+  footerLoader: {
+    alignItems: "center",
+    paddingVertical: 25,
+  },
+
+  footerText: {
+    color: "#9ca3af",
+    marginTop: 8,
+    fontSize: 12,
+  },
+
+  loadMoreErrorContainer: {
+    alignItems: "center",
+    paddingVertical: 22,
+  },
+
+  loadMoreErrorText: {
+    color: "#9ca3af",
+    fontSize: 13,
+  },
+
+  loadMoreRetryButton: {
+    backgroundColor: "#172033",
+    borderWidth: 1,
+    borderColor: "#97ce4c",
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: 20,
+    marginTop: 10,
+  },
+
+  loadMoreRetryText: {
+    color: "#97ce4c",
+    fontWeight: "700",
+  },
+
+  scrollTopButton: {
+    position: "absolute",
+    right: 18,
+    bottom: 18,
+
+    width: 50,
+    height: 50,
+
+    borderRadius: 25,
+
+    backgroundColor: "#97ce4c",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+
+    elevation: 8,
   },
 });

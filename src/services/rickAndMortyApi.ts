@@ -30,11 +30,16 @@ export interface CharacterResponse {
 }
 
 export async function getCharacters(
-  page = 1
+  page = 1,
+  status?: string
 ): Promise<CharacterResponse> {
-  const response = await fetch(
-    `${BASE_URL}/character?page=${page}`
-  );
+  let url = `${BASE_URL}/character?page=${page}`;
+
+  if (status) {
+    url += `&status=${status}`;
+  }
+
+  const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error("No se pudieron cargar los personajes");

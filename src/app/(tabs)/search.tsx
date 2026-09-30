@@ -19,6 +19,11 @@ import {
   searchCharacters,
 } from "../../services/rickAndMortyApi";
 
+import {
+  translateSpecies,
+  translateStatus,
+} from "../../utils/translations";
+
 export default function SearchScreen() {
   const router = useRouter();
 
@@ -61,7 +66,7 @@ export default function SearchScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.badge}>
-          INTERDIMENSIONAL SEARCH
+          BUSQUEDA INTERDIMENSIONAL
         </Text>
 
         <Text style={styles.title}>
@@ -201,12 +206,12 @@ export default function SearchScreen() {
                   />
 
                   <Text style={styles.statusText}>
-                    {item.status}
+                    {translateStatus(item.status)}
                   </Text>
                 </View>
 
                 <Text style={styles.species}>
-                  {item.species}
+                  {translateSpecies(item.species)}
                 </Text>
               </View>
 

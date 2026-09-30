@@ -17,6 +17,13 @@ import {
   getCharacterById,
 } from "../../services/rickAndMortyApi";
 
+import {
+  translateGender,
+  translateSpecies,
+  translateStatus,
+  translateUnknown,
+} from "../../utils/translations";
+
 export default function CharacterDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -135,7 +142,7 @@ export default function CharacterDetailScreen() {
             />
 
             <Text style={styles.status}>
-              {character.status}
+              {translateStatus(character.status)}
             </Text>
           </View>
 
@@ -144,26 +151,26 @@ export default function CharacterDetailScreen() {
           </Text>
 
           <Text style={styles.species}>
-            {character.species}
+            {translateSpecies(character.species)}
           </Text>
 
           <View style={styles.infoCard}>
             <InfoRow
               icon="person-outline"
               label="Género"
-              value={character.gender}
+              value={translateGender(character.gender)}
             />
 
             <InfoRow
               icon="planet-outline"
               label="Origen"
-              value={character.origin.name}
+              value={translateUnknown(character.origin.name)}
             />
 
             <InfoRow
               icon="location-outline"
               label="Ubicación"
-              value={character.location.name}
+              value={translateUnknown(character.location.name)}
             />
 
             <InfoRow
