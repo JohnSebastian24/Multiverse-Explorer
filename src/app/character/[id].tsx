@@ -1,6 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { checkIsFavorite, toggleFavorite } from "../../services/favoritesStorage";
 import { useEffect, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Character, getCharacterById, } from "../../services/rickAndMortyApi";
+import { appColors } from "../../constants/theme";
 import {
   ActivityIndicator,
   Image,
@@ -10,12 +14,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Character,
-  getCharacterById,
-} from "../../services/rickAndMortyApi";
-
 import {
   translateGender,
   translateSpecies,
@@ -23,10 +21,7 @@ import {
   translateUnknown,
 } from "../../utils/translations";
 
-import {
-  checkIsFavorite,
-  toggleFavorite,
-} from "../../services/favoritesStorage";
+
 
 export default function CharacterDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -38,7 +33,7 @@ export default function CharacterDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [favorite, setFavorite] =
-  useState(false);
+    useState(false);
 
   async function loadCharacter() {
     try {
@@ -47,12 +42,12 @@ export default function CharacterDetailScreen() {
 
       const data = await getCharacterById(id);
 
-setCharacter(data);
+      setCharacter(data);
 
-const savedAsFavorite =
-  await checkIsFavorite(data.id);
+      const savedAsFavorite =
+        await checkIsFavorite(data.id);
 
-setFavorite(savedAsFavorite);
+      setFavorite(savedAsFavorite);
     } catch (err) {
       console.error(err);
       setError(true);
@@ -61,16 +56,23 @@ setFavorite(savedAsFavorite);
     }
   }
 
-async function handleFavorite() {
-  if (!character) {
-    return;
+  async function handleFavorite() {
+    if (!character) {
+      return;
+    }
+
+    function handleBack() {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/");
+      }
+    }
+    const newFavoriteState =
+      await toggleFavorite(character);
+
+    setFavorite(newFavoriteState);
   }
-
-  const newFavoriteState =
-    await toggleFavorite(character);
-
-  setFavorite(newFavoriteState);
-}
 
   useEffect(() => {
     if (id) {
@@ -83,7 +85,7 @@ async function handleFavorite() {
       <View style={styles.center}>
         <ActivityIndicator
           size="large"
-          color="#97ce4c"
+          color={appColors.primary}
         />
 
         <Text style={styles.loadingText}>
@@ -113,7 +115,7 @@ async function handleFavorite() {
 
         <Pressable
           style={styles.backErrorButton}
-          onPress={() => router.back()}
+          onPress={handleBack}
         >
           <Text style={styles.backErrorText}>
             Volver
@@ -125,11 +127,18 @@ async function handleFavorite() {
 
   const statusColor =
     character.status === "Alive"
-      ? "#97ce4c"
+      ? appColors.primary
       : character.status === "Dead"
-      ? "#ef4444"
-      : "#9ca3af";
+        ? appColors.danger
+        : appColors.textMuted;
 
+  function handleBack() {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  }
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -144,12 +153,12 @@ async function handleFavorite() {
 
           <Pressable
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={handleBack}
           >
             <Ionicons
               name="arrow-back"
               size={24}
-              color="#ffffff"
+              color={appColors.text}
             />
           </Pressable>
         </View>
@@ -209,39 +218,39 @@ async function handleFavorite() {
             />
           </View>
           <Pressable
-  style={[
-    styles.favoriteButton,
-    favorite &&
-      styles.favoriteButtonActive,
-  ]}
-  onPress={handleFavorite}
->
-  <Ionicons
-    name={
-      favorite
-        ? "heart"
-        : "heart-outline"
-    }
-    size={22}
-    color={
-      favorite
-        ? "#ffffff"
-        : "#97ce4c"
-    }
-  />
+            style={[
+              styles.favoriteButton,
+              favorite &&
+              styles.favoriteButtonActive,
+            ]}
+            onPress={handleFavorite}
+          >
+            <Ionicons
+              name={
+                favorite
+                  ? "heart"
+                  : "heart-outline"
+              }
+              size={22}
+              color={
+                favorite
+                  ? "#ffffff"
+                  : "#97ce4c"
+              }
+            />
 
-  <Text
-    style={[
-      styles.favoriteButtonText,
-      favorite &&
-        styles.favoriteButtonTextActive,
-    ]}
-  >
-    {favorite
-      ? "Quitar de favoritos"
-      : "Agregar a favoritos"}
-  </Text>
-</Pressable>
+            <Text
+              style={[
+                styles.favoriteButtonText,
+                favorite &&
+                styles.favoriteButtonTextActive,
+              ]}
+            >
+              {favorite
+                ? "Quitar de favoritos"
+                : "Agregar a favoritos"}
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -272,7 +281,7 @@ function InfoRow({
         <Ionicons
           name={icon}
           size={20}
-          color="#00b5cc"
+          color={appColors.secondary}
         />
       </View>
 
@@ -292,7 +301,7 @@ function InfoRow({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#090e17",
+    backgroundColor: appColors.background,
   },
 
   scrollContent: {
@@ -301,14 +310,14 @@ const styles = StyleSheet.create({
 
   center: {
     flex: 1,
-    backgroundColor: "#090e17",
+    backgroundColor: appColors.background,
     justifyContent: "center",
     alignItems: "center",
     padding: 30,
   },
 
   loadingText: {
-    color: "#ffffff",
+    color: appColors.text,
     marginTop: 16,
     fontWeight: "600",
   },
@@ -318,7 +327,7 @@ const styles = StyleSheet.create({
   },
 
   errorTitle: {
-    color: "#ffffff",
+    color: appColors.text,
     fontSize: 22,
     fontWeight: "800",
     textAlign: "center",
@@ -326,7 +335,7 @@ const styles = StyleSheet.create({
   },
 
   retryButton: {
-    backgroundColor: "#97ce4c",
+    backgroundColor: appColors.primary,
     paddingHorizontal: 25,
     paddingVertical: 14,
     borderRadius: 14,
@@ -334,7 +343,7 @@ const styles = StyleSheet.create({
   },
 
   retryText: {
-    color: "#090e17",
+    color: appColors.textDark,
     fontWeight: "800",
   },
 
@@ -343,7 +352,7 @@ const styles = StyleSheet.create({
   },
 
   backErrorText: {
-    color: "#9ca3af",
+    color: appColors.textMuted,
   },
 
   imageContainer: {
@@ -353,6 +362,7 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     aspectRatio: 1,
+    backgroundColor: appColors.surfaceLight,
   },
 
   backButton: {
@@ -384,7 +394,7 @@ const styles = StyleSheet.create({
   },
 
   status: {
-    color: "#d1d5db",
+    color: appColors.textSoft,
     fontWeight: "700",
     textTransform: "uppercase",
     fontSize: 12,
@@ -392,26 +402,26 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    color: "#ffffff",
+    color: appColors.text,
     fontSize: 34,
     fontWeight: "900",
     marginTop: 10,
   },
 
   species: {
-    color: "#00b5cc",
+    color: appColors.secondary,
     fontSize: 17,
     fontWeight: "600",
     marginTop: 3,
   },
 
   infoCard: {
-    backgroundColor: "#111827",
+    backgroundColor: appColors.surface,
     borderRadius: 20,
     marginTop: 28,
     paddingHorizontal: 18,
     borderWidth: 1,
-    borderColor: "#1f2937",
+    borderColor: appColors.border,
   },
 
   infoRow: {
@@ -419,7 +429,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 17,
     borderBottomWidth: 1,
-    borderBottomColor: "#1f2937",
+    borderBottomColor: appColors.border,
   },
 
   lastInfoRow: {
@@ -430,7 +440,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: "#172033",
+    backgroundColor: appColors.surfaceLight,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 14,
@@ -441,45 +451,42 @@ const styles = StyleSheet.create({
   },
 
   infoLabel: {
-    color: "#6b7280",
+    color: appColors.textDisabled,
     fontSize: 12,
     fontWeight: "600",
   },
 
   infoValue: {
-    color: "#f3f4f6",
+    color: appColors.text,
     fontSize: 15,
     fontWeight: "700",
     marginTop: 3,
   },
+
   favoriteButton: {
-  marginTop: 22,
-  height: 54,
+    marginTop: 22,
+    height: 54,
+    borderRadius: 17,
+    borderWidth: 1,
+    borderColor: appColors.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 9,
+  },
 
-  borderRadius: 17,
+  favoriteButtonActive: {
+    backgroundColor: appColors.danger,
+    borderColor: appColors.danger,
+  },
 
-  borderWidth: 1,
-  borderColor: "#97ce4c",
+  favoriteButtonText: {
+    color: appColors.primary,
+    fontSize: 15,
+    fontWeight: "800",
+  },
 
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-
-  gap: 9,
-},
-
-favoriteButtonActive: {
-  backgroundColor: "#ef4444",
-  borderColor: "#ef4444",
-},
-
-favoriteButtonText: {
-  color: "#97ce4c",
-  fontSize: 15,
-  fontWeight: "800",
-},
-
-favoriteButtonTextActive: {
-  color: "#ffffff",
-},
+  favoriteButtonTextActive: {
+    color: appColors.text,
+  },
 });

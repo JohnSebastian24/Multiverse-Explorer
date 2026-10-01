@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import { useState } from "react";
+import { appColors } from "../../constants/theme";
 import {
   ActivityIndicator,
   FlatList,
@@ -80,13 +81,13 @@ export default function SearchScreen() {
           <Ionicons
             name="search"
             size={20}
-            color="#6b7280"
+            color={appColors.textDisabled}
           />
 
           <TextInput
             style={styles.input}
             placeholder="Ej. Rick, Morty, Summer..."
-            placeholderTextColor="#6b7280"
+            placeholderTextColor={appColors.textDisabled}
             value={query}
             onChangeText={setQuery}
             onSubmitEditing={handleSearch}
@@ -104,7 +105,7 @@ export default function SearchScreen() {
               <Ionicons
                 name="close-circle"
                 size={20}
-                color="#6b7280"
+                color={appColors.textDisabled}
               />
             </Pressable>
           )}
@@ -124,7 +125,7 @@ export default function SearchScreen() {
         <View style={styles.center}>
           <ActivityIndicator
             size="large"
-            color="#97ce4c"
+            color={appColors.primary}
           />
 
           <Text style={styles.loadingText}>
@@ -171,11 +172,11 @@ export default function SearchScreen() {
           renderItem={({ item }) => (
 
             <Pressable
-  style={styles.resultCard}
-  onPress={() =>
-    router.push(`/character/${item.id}` as Href)
-  }
->
+              style={styles.resultCard}
+              onPress={() =>
+                router.push(`/character/${item.id}` as Href)
+              }
+            >
               <Image
                 source={{ uri: item.image }}
                 style={styles.image}
@@ -196,10 +197,10 @@ export default function SearchScreen() {
                       {
                         backgroundColor:
                           item.status === "Alive"
-                            ? "#97ce4c"
+                            ? appColors.primary
                             : item.status === "Dead"
-                            ? "#ef4444"
-                            : "#9ca3af",
+                              ? appColors.danger
+                              : appColors.textMuted,
                       },
                     ]}
                   />
@@ -217,7 +218,7 @@ export default function SearchScreen() {
               <Ionicons
                 name="chevron-forward"
                 size={22}
-                color="#6b7280"
+                color={appColors.textDisabled}
               />
             </Pressable>
           )}
@@ -230,7 +231,7 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#090e17",
+    backgroundColor: appColors.background,
   },
 
   header: {
@@ -240,21 +241,21 @@ const styles = StyleSheet.create({
   },
 
   badge: {
-    color: "#97ce4c",
+    color: appColors.primary,
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 2,
   },
 
   title: {
-    color: "#ffffff",
+    color: appColors.text,
     fontSize: 36,
     fontWeight: "900",
     marginTop: 8,
   },
 
   subtitle: {
-    color: "#9ca3af",
+    color: appColors.textMuted,
     fontSize: 15,
     marginTop: 5,
   },
@@ -262,9 +263,9 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#111827",
+    backgroundColor: appColors.surface,
     borderWidth: 1,
-    borderColor: "#1f2937",
+    borderColor: appColors.border,
     borderRadius: 16,
     paddingHorizontal: 15,
     marginTop: 25,
@@ -273,7 +274,7 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
-    color: "#ffffff",
+    color: appColors.text,
     fontSize: 15,
     marginHorizontal: 10,
   },
@@ -281,14 +282,14 @@ const styles = StyleSheet.create({
   searchButton: {
     height: 50,
     borderRadius: 15,
-    backgroundColor: "#97ce4c",
+    backgroundColor: appColors.primary,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 12,
   },
 
   searchButtonText: {
-    color: "#090e17",
+    color: appColors.textDark,
     fontWeight: "800",
     fontSize: 15,
   },
@@ -301,7 +302,7 @@ const styles = StyleSheet.create({
   },
 
   loadingText: {
-    color: "#d1d5db",
+    color: appColors.textSoft,
     marginTop: 15,
   },
 
@@ -310,7 +311,7 @@ const styles = StyleSheet.create({
   },
 
   emptyTitle: {
-    color: "#ffffff",
+    color: appColors.text,
     fontSize: 21,
     fontWeight: "800",
     textAlign: "center",
@@ -318,7 +319,7 @@ const styles = StyleSheet.create({
   },
 
   emptyText: {
-    color: "#9ca3af",
+    color: appColors.textMuted,
     textAlign: "center",
     marginTop: 8,
   },
@@ -331,10 +332,10 @@ const styles = StyleSheet.create({
   resultCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#111827",
+    backgroundColor: appColors.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "#1f2937",
+    borderColor: appColors.border,
     padding: 10,
     marginBottom: 12,
   },
@@ -343,6 +344,7 @@ const styles = StyleSheet.create({
     width: 82,
     height: 82,
     borderRadius: 14,
+    backgroundColor: appColors.surfaceLight,
   },
 
   resultInfo: {
@@ -351,7 +353,7 @@ const styles = StyleSheet.create({
   },
 
   characterName: {
-    color: "#ffffff",
+    color: appColors.text,
     fontSize: 16,
     fontWeight: "800",
   },
@@ -370,12 +372,12 @@ const styles = StyleSheet.create({
   },
 
   statusText: {
-    color: "#d1d5db",
+    color: appColors.textSoft,
     fontSize: 12,
   },
 
   species: {
-    color: "#6b7280",
+    color: appColors.textDisabled,
     fontSize: 12,
     marginTop: 4,
   },

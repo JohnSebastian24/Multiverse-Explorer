@@ -1,14 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import {
-  Href,
-  useFocusEffect,
-  useRouter,
-} from "expo-router";
-import {
-  useCallback,
-  useState,
-} from "react";
-
+import { Href, useFocusEffect, useRouter, } from "expo-router";
+import { useCallback, useState } from "react";
+import { appColors } from "../../constants/theme";
 import {
   FlatList,
   Pressable,
@@ -18,17 +11,10 @@ import {
 } from "react-native";
 
 import { Image } from "expo-image";
-
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { Character } from "../../services/rickAndMortyApi";
-
 import { getFavorites } from "../../services/favoritesStorage";
-
-import {
-  translateSpecies,
-  translateStatus,
-} from "../../utils/translations";
+import { translateSpecies, translateStatus, } from "../../utils/translations";
 
 export default function FavoritesScreen() {
   const router = useRouter();
@@ -59,7 +45,7 @@ export default function FavoritesScreen() {
         contentContainerStyle={[
           styles.content,
           favorites.length === 0 &&
-            styles.emptyContent,
+          styles.emptyContent,
         ]}
         ListHeaderComponent={
           favorites.length > 0 ? (
@@ -88,7 +74,7 @@ export default function FavoritesScreen() {
               <Ionicons
                 name="heart-outline"
                 size={48}
-                color="#97ce4c"
+                color={appColors.primary}
               />
             </View>
 
@@ -142,13 +128,11 @@ export default function FavoritesScreen() {
                     styles.statusDot,
                     {
                       backgroundColor:
-                        item.status ===
-                        "Alive"
-                          ? "#97ce4c"
-                          : item.status ===
-                            "Dead"
-                          ? "#ef4444"
-                          : "#9ca3af",
+                        item.status === "Alive"
+                          ? appColors.primary
+                          : item.status === "Dead"
+                            ? appColors.danger
+                            : appColors.textMuted,
                     },
                   ]}
                 />
@@ -176,7 +160,7 @@ export default function FavoritesScreen() {
             <Ionicons
               name="chevron-forward"
               size={22}
-              color="#6b7280"
+              color={appColors.textDisabled}
             />
           </Pressable>
         )}
@@ -188,7 +172,7 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#090e17",
+    backgroundColor: appColors.background,
   },
 
   content: {
@@ -207,21 +191,21 @@ const styles = StyleSheet.create({
   },
 
   badge: {
-    color: "#97ce4c",
+    color: appColors.primary,
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 2,
   },
 
   title: {
-    color: "#ffffff",
+    color: appColors.text,
     fontSize: 36,
     fontWeight: "900",
     marginTop: 8,
   },
 
   subtitle: {
-    color: "#9ca3af",
+    color: appColors.textMuted,
     fontSize: 15,
     marginTop: 6,
   },
@@ -230,12 +214,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
 
-    backgroundColor: "#111827",
+    backgroundColor: appColors.surface,
 
     borderRadius: 18,
 
     borderWidth: 1,
-    borderColor: "#1f2937",
+    borderColor: appColors.border,
 
     padding: 10,
     marginBottom: 12,
@@ -245,7 +229,7 @@ const styles = StyleSheet.create({
     width: 82,
     height: 82,
     borderRadius: 14,
-    backgroundColor: "#172033",
+    backgroundColor: appColors.surfaceLight,
   },
 
   info: {
@@ -254,7 +238,7 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    color: "#ffffff",
+    color: appColors.text,
     fontSize: 16,
     fontWeight: "800",
   },
@@ -273,12 +257,12 @@ const styles = StyleSheet.create({
   },
 
   status: {
-    color: "#d1d5db",
+    color: appColors.textSoft,
     fontSize: 12,
   },
 
   species: {
-    color: "#6b7280",
+    color: appColors.textDisabled,
     fontSize: 12,
     marginTop: 4,
   },
@@ -293,17 +277,17 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 45,
 
-    backgroundColor: "#111827",
+    backgroundColor: appColors.surface,
 
     justifyContent: "center",
     alignItems: "center",
 
     borderWidth: 1,
-    borderColor: "#1f2937",
+    borderColor: appColors.border,
   },
 
   emptyTitle: {
-    color: "#ffffff",
+    color: appColors.text,
     fontSize: 22,
     fontWeight: "800",
     marginTop: 22,
@@ -311,7 +295,7 @@ const styles = StyleSheet.create({
   },
 
   emptyText: {
-    color: "#9ca3af",
+    color: appColors.textMuted,
     fontSize: 14,
     lineHeight: 21,
     marginTop: 10,
