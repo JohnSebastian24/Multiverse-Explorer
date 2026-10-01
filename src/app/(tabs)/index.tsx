@@ -2,32 +2,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { useScrollToTop } from "expo-router/react-navigation";
 import { Href, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Image } from "expo-image";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Character,getCharacters,} from "../../services/rickAndMortyApi";
+import FilterButton from "../../components/FilterButton";
+import ScrollTopButton from "../../components/ScrollTopButton";
+import CharacterCard from "../../components/CharacterCard";
 import {
     ActivityIndicator,
-    Animated,
     FlatList,
     NativeScrollEvent,
     NativeSyntheticEvent,
-    Platform,
     Pressable,
     StyleSheet,
     Text,
     View,
 } from "react-native";
-
-import { SafeAreaView } from "react-native-safe-area-context";
-
-import {
-    Character,
-    getCharacters,
-} from "../../services/rickAndMortyApi";
-
-import FilterButton from "../../components/FilterButton";
-import {
-    translateSpecies,
-    translateStatus,
-} from "../../utils/translations";
 
 export default function HomeScreen() {
     const router = useRouter();
@@ -62,9 +51,6 @@ export default function HomeScreen() {
     const [statusFilter, setStatusFilter] = useState("");
 
     const [showScrollTop, setShowScrollTop] = useState(false);
-
-    const scrollTopAnimation =
-        useRef(new Animated.Value(0)).current;
 
     async function loadCharacters(
         pageToLoad = 1,
@@ -190,17 +176,6 @@ export default function HomeScreen() {
             }
         }
     }
-
-    useEffect(() => {
-        Animated.timing(
-            scrollTopAnimation,
-            {
-                toValue: showScrollTop ? 1 : 0,
-                duration: 180,
-                useNativeDriver: Platform.OS !== "web",
-            }
-        ).start();
-    }, [showScrollTop, scrollTopAnimation]);
 
     useEffect(() => {
         activeFilterRef.current = "";
@@ -484,112 +459,21 @@ export default function HomeScreen() {
                     ) : null
                 }
                 renderItem={({ item }) => (
-                    <Pressable
-                        style={styles.card}
-                        onPress={() =>
-                            router.push(
-                                `/character/${item.id}` as Href
-                            )
-                        }
-                    >
-                        <Image
-                            source={item.image}
-                            style={styles.characterImage}
-                            contentFit="cover"
-                            cachePolicy="memory-disk"
-                            transition={200}
-                        />
-
-                        <View
-                            style={styles.cardContent}
-                        >
-                            <Text
-                                style={
-                                    styles.characterName
-                                }
-                                numberOfLines={1}
-                            >
-                                {item.name}
-                            </Text>
-
-                            <View
-                                style={
-                                    styles.statusContainer
-                                }
-                            >
-                                <View
-                                    style={[
-                                        styles.statusDot,
-                                        {
-                                            backgroundColor:
-                                                item.status ===
-                                                    "Alive"
-                                                    ? "#97ce4c"
-                                                    : item.status ===
-                                                        "Dead"
-                                                        ? "#ef4444"
-                                                        : "#9ca3af",
-                                        },
-                                    ]}
-                                />
-
-                                <Text
-                                    style={
-                                        styles.statusText
-                                    }
-                                >
-                                    {translateStatus(
-                                        item.status
-                                    )}
-                                </Text>
-                            </View>
-
-                            <Text
-                                style={styles.species}
-                            >
-                                {translateSpecies(
-                                    item.species
-                                )}
-                            </Text>
-                        </View>
-                    </Pressable>
-                )}
+  <CharacterCard
+    character={item}
+    onPress={() =>
+      router.push(
+        `/character/${item.id}` as Href
+      )
+    }
+  />
+)}
             />
 
-            <Animated.View
-                style={[
-                    styles.scrollTopWrapper,
-                    {
-                        pointerEvents:
-                            showScrollTop
-                                ? "auto"
-                                : "none",
-
-                        opacity: scrollTopAnimation,
-
-                        transform: [
-                            {
-                                scale:
-                                    scrollTopAnimation.interpolate({
-                                        inputRange: [0, 1],
-                                        outputRange: [0.85, 1],
-                                    }),
-                            },
-                        ],
-                    },
-                ]}
-            >
-                <Pressable
-                    style={styles.scrollTopButton}
-                    onPress={scrollToTop}
-                >
-                    <Ionicons
-                        name="arrow-up"
-                        size={25}
-                        color="#090e17"
-                    />
-                </Pressable>
-            </Animated.View>
+            <ScrollTopButton
+                visible={showScrollTop}
+                onPress={scrollToTop}
+            />
         </SafeAreaView>
     );
 }
@@ -696,56 +580,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
 
-    card: {
-        width: "48%",
-        backgroundColor: "#111827",
-        borderRadius: 18,
-        marginBottom: 18,
-        overflow: "hidden",
-        borderWidth: 1,
-        borderColor: "#1f2937",
-    },
-
-    characterImage: {
-        width: "100%",
-        aspectRatio: 1,
-        backgroundColor: "#172033",
-    },
-
-    cardContent: {
-        padding: 12,
-    },
-
-    characterName: {
-        color: "#ffffff",
-        fontWeight: "800",
-        fontSize: 15,
-    },
-
-    statusContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginTop: 8,
-    },
-
-    statusDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        marginRight: 6,
-    },
-
-    statusText: {
-        color: "#d1d5db",
-        fontSize: 12,
-    },
-
-    species: {
-        color: "#6b7280",
-        fontSize: 12,
-        marginTop: 4,
-    },
-
     footerLoader: {
         alignItems: "center",
         paddingVertical: 25,
@@ -798,32 +632,5 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 5,
         textAlign: "center",
-    },
-
-    scrollTopWrapper: {
-        position: "absolute",
-        right: 18,
-        bottom: 18,
-
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.3,
-        shadowRadius: 6,
-
-        elevation: 8,
-    },
-
-    scrollTopButton: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-
-        backgroundColor: "#97ce4c",
-
-        justifyContent: "center",
-        alignItems: "center",
     },
 });
