@@ -5,13 +5,12 @@ import {
   ActivityIndicator,
   Image,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Character,
   getCharacterById,
@@ -24,6 +23,11 @@ import {
   translateUnknown,
 } from "../../utils/translations";
 
+import {
+  checkIsFavorite,
+  toggleFavorite,
+} from "../../services/favoritesStorage";
+
 export default function CharacterDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -33,6 +37,8 @@ export default function CharacterDetailScreen() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [favorite, setFavorite] =
+  useState(false);
 
   async function loadCharacter() {
     try {
@@ -41,7 +47,12 @@ export default function CharacterDetailScreen() {
 
       const data = await getCharacterById(id);
 
-      setCharacter(data);
+setCharacter(data);
+
+const savedAsFavorite =
+  await checkIsFavorite(data.id);
+
+setFavorite(savedAsFavorite);
     } catch (err) {
       console.error(err);
       setError(true);
@@ -49,6 +60,17 @@ export default function CharacterDetailScreen() {
       setLoading(false);
     }
   }
+
+async function handleFavorite() {
+  if (!character) {
+    return;
+  }
+
+  const newFavoriteState =
+    await toggleFavorite(character);
+
+  setFavorite(newFavoriteState);
+}
 
   useEffect(() => {
     if (id) {
@@ -186,6 +208,40 @@ export default function CharacterDetailScreen() {
               last
             />
           </View>
+          <Pressable
+  style={[
+    styles.favoriteButton,
+    favorite &&
+      styles.favoriteButtonActive,
+  ]}
+  onPress={handleFavorite}
+>
+  <Ionicons
+    name={
+      favorite
+        ? "heart"
+        : "heart-outline"
+    }
+    size={22}
+    color={
+      favorite
+        ? "#ffffff"
+        : "#97ce4c"
+    }
+  />
+
+  <Text
+    style={[
+      styles.favoriteButtonText,
+      favorite &&
+        styles.favoriteButtonTextActive,
+    ]}
+  >
+    {favorite
+      ? "Quitar de favoritos"
+      : "Agregar a favoritos"}
+  </Text>
+</Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -396,4 +452,34 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginTop: 3,
   },
+  favoriteButton: {
+  marginTop: 22,
+  height: 54,
+
+  borderRadius: 17,
+
+  borderWidth: 1,
+  borderColor: "#97ce4c",
+
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+
+  gap: 9,
+},
+
+favoriteButtonActive: {
+  backgroundColor: "#ef4444",
+  borderColor: "#ef4444",
+},
+
+favoriteButtonText: {
+  color: "#97ce4c",
+  fontSize: 15,
+  fontWeight: "800",
+},
+
+favoriteButtonTextActive: {
+  color: "#ffffff",
+},
 });
