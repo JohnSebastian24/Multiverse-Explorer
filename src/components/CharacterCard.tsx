@@ -1,18 +1,8 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-
+import {Pressable,StyleSheet,Text,View,} from "react-native";
 import { Image } from "expo-image";
-
 import { Character } from "../services/rickAndMortyApi";
-
-import {
-  translateSpecies,
-  translateStatus,
-} from "../utils/translations";
+import { translateSpecies,translateStatus,} from "../utils/translations";
+import { appColors } from "../constants/theme";
 
 interface CharacterCardProps {
   character: Character;
@@ -24,11 +14,11 @@ export default function CharacterCard({
   onPress,
 }: CharacterCardProps) {
   const statusColor =
-    character.status === "Alive"
-      ? "#97ce4c"
-      : character.status === "Dead"
-      ? "#ef4444"
-      : "#9ca3af";
+  character.status === "Alive"
+    ? appColors.primary
+    : character.status === "Dead"
+    ? appColors.danger
+    : appColors.textMuted;
 
   return (
     <Pressable
@@ -81,18 +71,18 @@ export default function CharacterCard({
 const styles = StyleSheet.create({
   card: {
     width: "48%",
-    backgroundColor: "#111827",
+    backgroundColor: appColors.surface,
     borderRadius: 18,
     marginBottom: 18,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#1f2937",
+    borderColor: appColors.border,
   },
 
   characterImage: {
     width: "100%",
     aspectRatio: 1,
-    backgroundColor: "#172033",
+    backgroundColor: appColors.surfaceLight,
   },
 
   cardContent: {
@@ -100,7 +90,7 @@ const styles = StyleSheet.create({
   },
 
   characterName: {
-    color: "#ffffff",
+    color: appColors.text,
     fontWeight: "800",
     fontSize: 15,
   },
@@ -119,12 +109,12 @@ const styles = StyleSheet.create({
   },
 
   statusText: {
-    color: "#d1d5db",
+    color: appColors.textSoft,
     fontSize: 12,
   },
 
   species: {
-    color: "#6b7280",
+    color: appColors.textDisabled,
     fontSize: 12,
     marginTop: 4,
   },

@@ -3,7 +3,7 @@ import {
   StyleSheet,
   Text,
 } from "react-native";
-
+import { appColors } from "../constants/theme";
 interface FilterButtonProps {
   label: string;
   active: boolean;
@@ -39,26 +39,26 @@ export default function FilterButton({
 
 const styles = StyleSheet.create({
   filterButton: {
-    backgroundColor: "#111827",
+    backgroundColor: appColors.surface,
     borderWidth: 1,
-    borderColor: "#1f2937",
+    borderColor: appColors.border,
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 20,
   },
 
   filterButtonActive: {
-    backgroundColor: "#97ce4c",
-    borderColor: "#97ce4c",
+    backgroundColor: appColors.primary,
+    borderColor: appColors.primary,
   },
 
   filterText: {
-    color: "#9ca3af",
+    color: appColors.textMuted,
     fontSize: 12,
     fontWeight: "700",
   },
 
   filterTextActive: {
-    color: "#090e17",
+    color: appColors.textDark,
   },
 });

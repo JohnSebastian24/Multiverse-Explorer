@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
-
+import { appColors } from "../constants/theme";
 import {
   Animated,
   Platform,
@@ -61,7 +61,7 @@ export default function ScrollTopButton({
         <Ionicons
           name="arrow-up"
           size={25}
-          color="#090e17"
+          color={appColors.textDark}
         />
       </Pressable>
     </Animated.View>
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.30)",
       }
     : {
-        shadowColor: "#000",
+        shadowColor: appColors.black,
         shadowOffset: {
           width: 0,
           height: 4,
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 25,
 
-    backgroundColor: "#97ce4c",
+    backgroundColor: appColors.primary,
 
     justifyContent: "center",
     alignItems: "center",
