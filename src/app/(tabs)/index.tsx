@@ -3,10 +3,11 @@ import { useScrollToTop } from "expo-router/react-navigation";
 import { Href, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Character,getCharacters,} from "../../services/rickAndMortyApi";
+import { Character, getCharacters, } from "../../services/rickAndMortyApi";
 import FilterButton from "../../components/FilterButton";
 import ScrollTopButton from "../../components/ScrollTopButton";
 import CharacterCard from "../../components/CharacterCard";
+import { appColors } from "../../constants/theme";
 import {
     ActivityIndicator,
     FlatList,
@@ -249,7 +250,7 @@ export default function HomeScreen() {
             <View style={styles.center}>
                 <ActivityIndicator
                     size="large"
-                    color="#97ce4c"
+                    color={appColors.primary}
                 />
 
                 <Text style={styles.loadingText}>
@@ -396,7 +397,7 @@ export default function HomeScreen() {
                         <View style={styles.footerLoader}>
                             <ActivityIndicator
                                 size="small"
-                                color="#97ce4c"
+                                color={appColors.primary}
                             />
 
                             <Text style={styles.footerText}>
@@ -445,7 +446,7 @@ export default function HomeScreen() {
                             <Ionicons
                                 name="planet-outline"
                                 size={30}
-                                color="#97ce4c"
+                                color={appColors.primary}
                             />
 
                             <Text style={styles.endTitle}>
@@ -459,15 +460,15 @@ export default function HomeScreen() {
                     ) : null
                 }
                 renderItem={({ item }) => (
-  <CharacterCard
-    character={item}
-    onPress={() =>
-      router.push(
-        `/character/${item.id}` as Href
-      )
-    }
-  />
-)}
+                    <CharacterCard
+                        character={item}
+                        onPress={() =>
+                            router.push(
+                                `/character/${item.id}` as Href
+                            )
+                        }
+                    />
+                )}
             />
 
             <ScrollTopButton
@@ -481,19 +482,19 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#090e17",
+        backgroundColor: appColors.background,
     },
 
     center: {
         flex: 1,
-        backgroundColor: "#090e17",
+        backgroundColor: appColors.background,
         justifyContent: "center",
         alignItems: "center",
         padding: 30,
     },
 
     loadingText: {
-        color: "#ffffff",
+        color: appColors.text,
         marginTop: 16,
         fontSize: 16,
         fontWeight: "600",
@@ -505,14 +506,14 @@ const styles = StyleSheet.create({
     },
 
     errorTitle: {
-        color: "#ffffff",
+        color: appColors.text,
         fontSize: 24,
         fontWeight: "800",
         textAlign: "center",
     },
 
     errorText: {
-        color: "#9ca3af",
+        color: appColors.textMuted,
         fontSize: 15,
         textAlign: "center",
         marginTop: 12,
@@ -521,14 +522,14 @@ const styles = StyleSheet.create({
 
     retryButton: {
         marginTop: 25,
-        backgroundColor: "#97ce4c",
+        backgroundColor: appColors.primary,
         paddingHorizontal: 24,
         paddingVertical: 14,
         borderRadius: 14,
     },
 
     retryButtonText: {
-        color: "#090e17",
+        color: appColors.textDark,
         fontWeight: "800",
     },
 
@@ -543,7 +544,7 @@ const styles = StyleSheet.create({
     },
 
     badge: {
-        color: "#97ce4c",
+        color: appColors.primary,
         fontSize: 11,
         fontWeight: "700",
         letterSpacing: 2,
@@ -551,20 +552,20 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: "#ffffff",
+        color: appColors.text,
         fontSize: 38,
         fontWeight: "900",
     },
 
     subtitle: {
-        color: "#00b5cc",
+        color: appColors.secondary,
         fontSize: 38,
         fontWeight: "900",
         marginTop: -5,
     },
 
     description: {
-        color: "#9ca3af",
+        color: appColors.textMuted,
         marginTop: 12,
         fontSize: 15,
     },
@@ -586,7 +587,7 @@ const styles = StyleSheet.create({
     },
 
     footerText: {
-        color: "#9ca3af",
+        color: appColors.textMuted,
         marginTop: 8,
         fontSize: 12,
     },
@@ -597,21 +598,22 @@ const styles = StyleSheet.create({
     },
 
     loadMoreErrorText: {
-        color: "#9ca3af",
+        color: appColors.textMuted,
         fontSize: 13,
     },
 
     loadMoreRetryButton: {
-        backgroundColor: "#172033",
+        backgroundColor: appColors.surfaceLight,
         borderWidth: 1,
-        borderColor: "#97ce4c",
+        borderColor: appColors.primary,
         paddingHorizontal: 18,
         paddingVertical: 9,
         borderRadius: 20,
         marginTop: 10,
     },
+
     loadMoreRetryText: {
-        color: "#97ce4c",
+        color: appColors.primary,
         fontWeight: "700",
     },
 
@@ -621,14 +623,14 @@ const styles = StyleSheet.create({
     },
 
     endTitle: {
-        color: "#ffffff",
+        color: appColors.text,
         fontSize: 17,
         fontWeight: "800",
         marginTop: 10,
     },
 
     endText: {
-        color: "#6b7280",
+        color: appColors.textDisabled,
         fontSize: 12,
         marginTop: 5,
         textAlign: "center",
