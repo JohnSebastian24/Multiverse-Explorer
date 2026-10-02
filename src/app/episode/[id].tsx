@@ -41,6 +41,23 @@ import {
     getEpisodeById,
 } from "../../services/rickAndMortyApi";
 
+function formatEpisodeDate(date: string) {
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return date;
+    }
+
+    return parsedDate.toLocaleDateString(
+        "es-CO",
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        }
+    );
+}
+
 export default function EpisodeDetailScreen() {
     const router = useRouter();
 
@@ -206,17 +223,6 @@ export default function EpisodeDetailScreen() {
                 contentContainerStyle={styles.content}
                 ListHeaderComponent={
                     <View style={styles.header}>
-                        <Pressable
-                            style={styles.backButton}
-                            onPress={handleBack}
-                        >
-                            <Ionicons
-                                name="arrow-back"
-                                size={23}
-                                color={appColors.text}
-                            />
-                        </Pressable>
-
                         <Text style={styles.badge}>
                             ARCHIVO INTERDIMENSIONAL
                         </Text>
@@ -245,7 +251,7 @@ export default function EpisodeDetailScreen() {
                                     </Text>
 
                                     <Text style={styles.infoValue}>
-                                        {episode.air_date}
+                                        {formatEpisodeDate(episode.air_date)}
                                     </Text>
                                 </View>
                             </View>
@@ -317,6 +323,10 @@ const styles = StyleSheet.create({
     },
 
     content: {
+        width: "100%",
+        maxWidth: 760,
+        alignSelf: "center",
+
         paddingHorizontal: 16,
         paddingBottom: 40,
     },
@@ -380,23 +390,6 @@ const styles = StyleSheet.create({
     header: {
         paddingTop: 12,
         paddingBottom: 25,
-    },
-
-    backButton: {
-        width: 44,
-        height: 44,
-
-        borderRadius: 22,
-
-        backgroundColor: appColors.surface,
-
-        borderWidth: 1,
-        borderColor: appColors.border,
-
-        justifyContent: "center",
-        alignItems: "center",
-
-        marginBottom: 25,
     },
 
     badge: {

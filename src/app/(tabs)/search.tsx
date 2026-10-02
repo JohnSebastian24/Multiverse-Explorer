@@ -24,6 +24,8 @@ import {
   translateStatus,
 } from "../../utils/translations";
 
+import { resolveCharacterSearch,} from "../../utils/searchAliases";
+
 export default function SearchScreen() {
   const router = useRouter();
 
@@ -36,22 +38,26 @@ export default function SearchScreen() {
   const [error, setError] = useState(false);
 
   async function handleSearch() {
-    const text = query.trim();
+  const text = query.trim();
 
-    if (!text) {
-      return;
-    }
+  if (!text) {
+    return;
+  }
 
-    try {
-      Keyboard.dismiss();
+  try {
+    Keyboard.dismiss();
 
-      setLoading(true);
-      setError(false);
-      setSearched(true);
+    setLoading(true);
+    setError(false);
+    setSearched(true);
 
-      const data = await searchCharacters(text);
+    const apiSearch =
+      resolveCharacterSearch(text);
 
-      setResults(data);
+    const data =
+      await searchCharacters(apiSearch);
+
+    setResults(data);
     } catch (err) {
       console.error(err);
 
@@ -135,14 +141,35 @@ export default function SearchScreen() {
       )}
 
       {!loading && error && (
-        <View style={styles.center}>
-          <Text style={styles.emptyIcon}>🛸</Text>
+  <View style={styles.center}>
+    <Text style={styles.emptyIcon}>
+      🛸
+    </Text>
 
-          <Text style={styles.emptyTitle}>
-            No pudimos conectar con esta dimensión
-          </Text>
-        </View>
-      )}
+    <Text style={styles.emptyTitle}>
+      No pudimos conectar con esta dimensión
+    </Text>
+
+    <Text style={styles.emptyText}>
+      Revisa tu conexión e intenta nuevamente.
+    </Text>
+
+    <Pressable
+      style={styles.retryButton}
+      onPress={handleSearch}
+    >
+      <Ionicons
+        name="refresh"
+        size={18}
+        color={appColors.textDark}
+      />
+
+      <Text style={styles.retryButtonText}>
+        Reintentar
+      </Text>
+    </Pressable>
+  </View>
+)}
 
       {!loading &&
         !error &&
@@ -297,6 +324,29 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     fontSize: 15,
   },
+
+retryButton: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+
+  gap: 7,
+
+  backgroundColor: appColors.primary,
+
+  paddingHorizontal: 20,
+  paddingVertical: 12,
+
+  borderRadius: 14,
+
+  marginTop: 20,
+},
+
+retryButtonText: {
+  color: appColors.textDark,
+  fontSize: 14,
+  fontWeight: "800",
+},
 
   center: {
     flex: 1,

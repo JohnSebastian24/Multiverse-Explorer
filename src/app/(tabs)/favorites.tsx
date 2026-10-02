@@ -93,7 +93,10 @@ export default function FavoritesScreen() {
         }
         renderItem={({ item }) => (
           <Pressable
-            style={styles.card}
+            style={({ pressed }) => [
+              styles.card,
+              pressed && styles.cardPressed,
+            ]}
             onPress={() =>
               router.push(
                 `/character/${item.id}` as Href
@@ -176,13 +179,22 @@ const styles = StyleSheet.create({
   },
 
   content: {
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
+
     paddingHorizontal: 20,
-    paddingBottom: 30,
+    paddingBottom: 100,
   },
 
   emptyContent: {
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
+
     flexGrow: 1,
-    justifyContent: "center",
+
+    // conserva aquí tus demás estilos
   },
 
   header: {
@@ -224,6 +236,16 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 12,
   },
+
+  cardPressed: {
+  opacity: 0.82,
+
+  transform: [
+    {
+      scale: 0.99,
+    },
+  ],
+},
 
   image: {
     width: 82,

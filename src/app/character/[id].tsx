@@ -215,10 +215,14 @@ export default function CharacterDetailScreen() {
           </View>
 
           <Pressable
-            style={[
+            style={({ pressed }) => [
               styles.favoriteButton,
+
               favorite &&
               styles.favoriteButtonActive,
+
+              pressed &&
+              styles.favoriteButtonPressed,
             ]}
             onPress={handleFavorite}
           >
@@ -374,8 +378,22 @@ const styles = StyleSheet.create({
     color: appColors.textMuted,
   },
 
+  favoriteButtonPressed: {
+    opacity: 0.78,
+
+    transform: [
+      {
+        scale: 0.98,
+      },
+    ],
+  },
+
   imageContainer: {
     position: "relative",
+
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
   },
 
   image: {
@@ -385,6 +403,10 @@ const styles = StyleSheet.create({
   },
 
   content: {
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
+
     padding: 22,
   },
 
@@ -457,9 +479,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  infoRowPressed: {
-    opacity: 0.65,
-  },
+ infoRowPressed: {
+  opacity: 0.72,
+
+  transform: [
+    {
+      scale: 0.99,
+    },
+  ],
+},
 
   infoLabel: {
     color: appColors.textDisabled,

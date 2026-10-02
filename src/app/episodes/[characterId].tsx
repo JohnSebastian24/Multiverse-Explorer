@@ -272,18 +272,18 @@ export default function CharacterEpisodesScreen() {
                     />
                 )}
             />
-                  <TopNavigationButtons
-        onBack={handleBack}
-        onHome={() =>
-          router.replace("/")
-        }
-      />
+            <TopNavigationButtons
+                onBack={handleBack}
+                onHome={() =>
+                    router.replace("/")
+                }
+            />
 
-      <ScrollTopButton
-        visible={showScrollTop}
-        onPress={scrollToTop}
-      />
-    </SafeAreaView>
+            <ScrollTopButton
+                visible={showScrollTop}
+                onPress={scrollToTop}
+            />
+        </SafeAreaView>
     );
 }
 
@@ -294,6 +294,10 @@ const styles = StyleSheet.create({
     },
 
     content: {
+        width: "100%",
+        maxWidth: 760,
+        alignSelf: "center",
+
         paddingHorizontal: 20,
         paddingBottom: 35,
     },
