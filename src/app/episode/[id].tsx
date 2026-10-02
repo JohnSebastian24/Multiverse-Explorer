@@ -1,23 +1,26 @@
 import { Ionicons } from "@expo/vector-icons";
 
 import {
-  Href,
-  useLocalSearchParams,
-  useRouter,
+    Href,
+    useLocalSearchParams,
+    useRouter,
 } from "expo-router";
 
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useRef,
+    useState,
 } from "react";
 
 import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    FlatList,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -26,418 +29,464 @@ import CharacterCard from "../../components/CharacterCard";
 
 import { appColors } from "../../constants/theme";
 
+import FloatingBackButton from "../../components/FloatingBackButton";
+
+import ScrollTopButton from "../../components/ScrollTopButton";
 import {
-  Character,
-  Episode,
-  extractIdsFromUrls,
-  getCharactersByIds,
-  getEpisodeById,
+    Character,
+    Episode,
+    extractIdsFromUrls,
+    getCharactersByIds,
+    getEpisodeById,
 } from "../../services/rickAndMortyApi";
 
 export default function EpisodeDetailScreen() {
-  const router = useRouter();
+    const router = useRouter();
 
-  const { id } =
-    useLocalSearchParams<{
-      id: string;
-    }>();
+    const listRef =
+        useRef<FlatList<Character>>(null);
 
-  const [episode, setEpisode] =
-    useState<Episode | null>(null);
+    const { id } =
+        useLocalSearchParams<{
+            id: string;
+        }>();
 
-  const [characters, setCharacters] =
-    useState<Character[]>([]);
+    const [episode, setEpisode] =
+        useState<Episode | null>(null);
 
-  const [loading, setLoading] =
-    useState(true);
+    const [characters, setCharacters] =
+        useState<Character[]>([]);
 
-  const [error, setError] =
-    useState(false);
+    const [loading, setLoading] =
+        useState(true);
 
-  async function loadEpisode() {
-    try {
-      setLoading(true);
-      setError(false);
+    const [error, setError] =
+        useState(false);
 
-      const episodeData =
-        await getEpisodeById(id);
+    const [showFloatingButtons, setShowFloatingButtons] =
+        useState(false);
 
-      setEpisode(episodeData);
+    async function loadEpisode() {
+        try {
+            setLoading(true);
+            setError(false);
 
-      const characterIds =
-        extractIdsFromUrls(
-          episodeData.characters
-        );
+            const episodeData =
+                await getEpisodeById(id);
 
-      const characterData =
-        await getCharactersByIds(
-          characterIds
-        );
+            setEpisode(episodeData);
 
-      setCharacters(characterData);
-    } catch (err) {
-      console.log(
-        "No se pudo cargar el episodio:",
-        err
-      );
+            const characterIds =
+                extractIdsFromUrls(
+                    episodeData.characters
+                );
 
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }
+            const characterData =
+                await getCharactersByIds(
+                    characterIds
+                );
 
-  function handleBack() {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace("/");
-    }
-  }
+            setCharacters(characterData);
+        } catch (err) {
+            console.log(
+                "No se pudo cargar el episodio:",
+                err
+            );
 
-  useEffect(() => {
-    if (id) {
-      loadEpisode();
-    }
-  }, [id]);
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator
-          size="large"
-          color={appColors.primary}
-        />
-
-        <Text style={styles.loadingText}>
-          Sintonizando episodio...
-        </Text>
-      </View>
-    );
-  }
-
-  if (error || !episode) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.errorIcon}>
-          📺
-        </Text>
-
-        <Text style={styles.errorTitle}>
-          No pudimos sintonizar este episodio
-        </Text>
-
-        <Text style={styles.errorText}>
-          El portal tuvo problemas para obtener la información.
-        </Text>
-
-        <Pressable
-          style={styles.retryButton}
-          onPress={loadEpisode}
-        >
-          <Text style={styles.retryText}>
-            Intentar nuevamente
-          </Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.backErrorButton}
-          onPress={handleBack}
-        >
-          <Text style={styles.backErrorText}>
-            Volver
-          </Text>
-        </Pressable>
-      </View>
-    );
-  }
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={characters}
-        keyExtractor={(item) =>
-          item.id.toString()
+            setError(true);
+        } finally {
+            setLoading(false);
         }
-        numColumns={2}
-        columnWrapperStyle={styles.row}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-        ListHeaderComponent={
-          <View style={styles.header}>
-            <Pressable
-              style={styles.backButton}
-              onPress={handleBack}
-            >
-              <Ionicons
-                name="arrow-back"
-                size={23}
-                color={appColors.text}
-              />
-            </Pressable>
+    }
 
-            <Text style={styles.badge}>
-              ARCHIVO INTERDIMENSIONAL
-            </Text>
-
-            <Text style={styles.episodeCode}>
-              {episode.episode}
-            </Text>
-
-            <Text style={styles.title}>
-              {episode.name}
-            </Text>
-
-            <View style={styles.infoCard}>
-              <View style={styles.infoRow}>
-                <View style={styles.infoIcon}>
-                  <Ionicons
-                    name="calendar-outline"
-                    size={20}
-                    color={appColors.secondary}
-                  />
-                </View>
-
-                <View>
-                  <Text style={styles.infoLabel}>
-                    Fecha de emisión
-                  </Text>
-
-                  <Text style={styles.infoValue}>
-                    {episode.air_date}
-                  </Text>
-                </View>
-              </View>
-
-              <View
-                style={[
-                  styles.infoRow,
-                  styles.lastInfoRow,
-                ]}
-              >
-                <View style={styles.infoIcon}>
-                  <Ionicons
-                    name="people-outline"
-                    size={20}
-                    color={appColors.secondary}
-                  />
-                </View>
-
-                <View>
-                  <Text style={styles.infoLabel}>
-                    Personajes
-                  </Text>
-
-                  <Text style={styles.infoValue}>
-                    {characters.length} apariciones
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            <Text style={styles.sectionTitle}>
-              Personajes del episodio
-            </Text>
-
-            <Text style={styles.sectionSubtitle}>
-              Toca un personaje para consultar su ficha.
-            </Text>
-          </View>
+    function handleBack() {
+        if (router.canGoBack()) {
+            router.back();
+        } else {
+            router.replace("/");
         }
-        renderItem={({ item }) => (
-          <CharacterCard
-            character={item}
-            onPress={() =>
-              router.push(
-                `/character/${item.id}` as Href
-              )
+    }
+
+    function scrollToTop() {
+        listRef.current?.scrollToOffset({
+            offset: 0,
+            animated: true,
+        });
+    }
+
+    function handleScroll(
+        event: NativeSyntheticEvent<NativeScrollEvent>
+    ) {
+        const offset =
+            event.nativeEvent.contentOffset.y;
+
+        const shouldShow =
+            offset > 500;
+
+        setShowFloatingButtons((current) => {
+            if (current === shouldShow) {
+                return current;
             }
-          />
-        )}
-      />
-    </SafeAreaView>
-  );
+
+            return shouldShow;
+        });
+    }
+
+    useEffect(() => {
+        if (id) {
+            loadEpisode();
+        }
+    }, [id]);
+
+    if (loading) {
+        return (
+            <View style={styles.center}>
+                <ActivityIndicator
+                    size="large"
+                    color={appColors.primary}
+                />
+
+                <Text style={styles.loadingText}>
+                    Sintonizando episodio...
+                </Text>
+            </View>
+        );
+    }
+
+    if (error || !episode) {
+        return (
+            <View style={styles.center}>
+                <Text style={styles.errorIcon}>
+                    📺
+                </Text>
+
+                <Text style={styles.errorTitle}>
+                    No pudimos sintonizar este episodio
+                </Text>
+
+                <Text style={styles.errorText}>
+                    El portal tuvo problemas para obtener la información.
+                </Text>
+
+                <Pressable
+                    style={styles.retryButton}
+                    onPress={loadEpisode}
+                >
+                    <Text style={styles.retryText}>
+                        Intentar nuevamente
+                    </Text>
+                </Pressable>
+
+                <Pressable
+                    style={styles.backErrorButton}
+                    onPress={handleBack}
+                >
+                    <Text style={styles.backErrorText}>
+                        Volver
+                    </Text>
+                </Pressable>
+            </View>
+        );
+    }
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <FlatList
+                ref={listRef}
+                data={characters}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+                keyExtractor={(item) =>
+                    item.id.toString()
+                }
+                numColumns={2}
+                columnWrapperStyle={styles.row}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.content}
+                ListHeaderComponent={
+                    <View style={styles.header}>
+                        <Pressable
+                            style={styles.backButton}
+                            onPress={handleBack}
+                        >
+                            <Ionicons
+                                name="arrow-back"
+                                size={23}
+                                color={appColors.text}
+                            />
+                        </Pressable>
+
+                        <Text style={styles.badge}>
+                            ARCHIVO INTERDIMENSIONAL
+                        </Text>
+
+                        <Text style={styles.episodeCode}>
+                            {episode.episode}
+                        </Text>
+
+                        <Text style={styles.title}>
+                            {episode.name}
+                        </Text>
+
+                        <View style={styles.infoCard}>
+                            <View style={styles.infoRow}>
+                                <View style={styles.infoIcon}>
+                                    <Ionicons
+                                        name="calendar-outline"
+                                        size={20}
+                                        color={appColors.secondary}
+                                    />
+                                </View>
+
+                                <View>
+                                    <Text style={styles.infoLabel}>
+                                        Fecha de emisión
+                                    </Text>
+
+                                    <Text style={styles.infoValue}>
+                                        {episode.air_date}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View
+                                style={[
+                                    styles.infoRow,
+                                    styles.lastInfoRow,
+                                ]}
+                            >
+                                <View style={styles.infoIcon}>
+                                    <Ionicons
+                                        name="people-outline"
+                                        size={20}
+                                        color={appColors.secondary}
+                                    />
+                                </View>
+
+                                <View>
+                                    <Text style={styles.infoLabel}>
+                                        Personajes
+                                    </Text>
+
+                                    <Text style={styles.infoValue}>
+                                        {characters.length} apariciones
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        <Text style={styles.sectionTitle}>
+                            Personajes del episodio
+                        </Text>
+
+                        <Text style={styles.sectionSubtitle}>
+                            Toca un personaje para consultar su ficha.
+                        </Text>
+                    </View>
+                }
+                renderItem={({ item }) => (
+                    <CharacterCard
+                        character={item}
+                        onPress={() =>
+                            router.push(
+                                `/character/${item.id}` as Href
+                            )
+                        }
+                    />
+                )}
+            />
+            <FloatingBackButton
+                visible={showFloatingButtons}
+                onPress={handleBack}
+            />
+
+            <ScrollTopButton
+                visible={showFloatingButtons}
+                onPress={scrollToTop}
+            />
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: appColors.background,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: appColors.background,
+    },
 
-  content: {
-    paddingHorizontal: 16,
-    paddingBottom: 40,
-  },
+    content: {
+        paddingHorizontal: 16,
+        paddingBottom: 40,
+    },
 
-  center: {
-    flex: 1,
-    backgroundColor: appColors.background,
+    center: {
+        flex: 1,
+        backgroundColor: appColors.background,
 
-    justifyContent: "center",
-    alignItems: "center",
+        justifyContent: "center",
+        alignItems: "center",
 
-    padding: 30,
-  },
+        padding: 30,
+    },
 
-  loadingText: {
-    color: appColors.textSoft,
-    marginTop: 15,
-    fontWeight: "600",
-  },
+    loadingText: {
+        color: appColors.textSoft,
+        marginTop: 15,
+        fontWeight: "600",
+    },
 
-  errorIcon: {
-    fontSize: 55,
-  },
+    errorIcon: {
+        fontSize: 55,
+    },
 
-  errorTitle: {
-    color: appColors.text,
-    fontSize: 22,
-    fontWeight: "800",
-    textAlign: "center",
-    marginTop: 15,
-  },
+    errorTitle: {
+        color: appColors.text,
+        fontSize: 22,
+        fontWeight: "800",
+        textAlign: "center",
+        marginTop: 15,
+    },
 
-  errorText: {
-    color: appColors.textMuted,
-    textAlign: "center",
-    marginTop: 10,
-    lineHeight: 21,
-  },
+    errorText: {
+        color: appColors.textMuted,
+        textAlign: "center",
+        marginTop: 10,
+        lineHeight: 21,
+    },
 
-  retryButton: {
-    backgroundColor: appColors.primary,
-    paddingHorizontal: 22,
-    paddingVertical: 13,
-    borderRadius: 15,
-    marginTop: 24,
-  },
+    retryButton: {
+        backgroundColor: appColors.primary,
+        paddingHorizontal: 22,
+        paddingVertical: 13,
+        borderRadius: 15,
+        marginTop: 24,
+    },
 
-  retryText: {
-    color: appColors.textDark,
-    fontWeight: "800",
-  },
+    retryText: {
+        color: appColors.textDark,
+        fontWeight: "800",
+    },
 
-  backErrorButton: {
-    marginTop: 15,
-  },
+    backErrorButton: {
+        marginTop: 15,
+    },
 
-  backErrorText: {
-    color: appColors.textMuted,
-  },
+    backErrorText: {
+        color: appColors.textMuted,
+    },
 
-  header: {
-    paddingTop: 12,
-    paddingBottom: 25,
-  },
+    header: {
+        paddingTop: 12,
+        paddingBottom: 25,
+    },
 
-  backButton: {
-    width: 44,
-    height: 44,
+    backButton: {
+        width: 44,
+        height: 44,
 
-    borderRadius: 22,
+        borderRadius: 22,
 
-    backgroundColor: appColors.surface,
+        backgroundColor: appColors.surface,
 
-    borderWidth: 1,
-    borderColor: appColors.border,
+        borderWidth: 1,
+        borderColor: appColors.border,
 
-    justifyContent: "center",
-    alignItems: "center",
+        justifyContent: "center",
+        alignItems: "center",
 
-    marginBottom: 25,
-  },
+        marginBottom: 25,
+    },
 
-  badge: {
-    color: appColors.primary,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 2,
-  },
+    badge: {
+        color: appColors.primary,
+        fontSize: 11,
+        fontWeight: "700",
+        letterSpacing: 2,
+    },
 
-  episodeCode: {
-    color: appColors.secondary,
-    fontSize: 15,
-    fontWeight: "800",
-    marginTop: 14,
-  },
+    episodeCode: {
+        color: appColors.secondary,
+        fontSize: 15,
+        fontWeight: "800",
+        marginTop: 14,
+    },
 
-  title: {
-    color: appColors.text,
-    fontSize: 34,
-    fontWeight: "900",
-    marginTop: 4,
-  },
+    title: {
+        color: appColors.text,
+        fontSize: 34,
+        fontWeight: "900",
+        marginTop: 4,
+    },
 
-  infoCard: {
-    backgroundColor: appColors.surface,
+    infoCard: {
+        backgroundColor: appColors.surface,
 
-    borderRadius: 20,
+        borderRadius: 20,
 
-    borderWidth: 1,
-    borderColor: appColors.border,
+        borderWidth: 1,
+        borderColor: appColors.border,
 
-    paddingHorizontal: 18,
+        paddingHorizontal: 18,
 
-    marginTop: 25,
-  },
+        marginTop: 25,
+    },
 
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    infoRow: {
+        flexDirection: "row",
+        alignItems: "center",
 
-    paddingVertical: 17,
+        paddingVertical: 17,
 
-    borderBottomWidth: 1,
-    borderBottomColor: appColors.border,
-  },
+        borderBottomWidth: 1,
+        borderBottomColor: appColors.border,
+    },
 
-  lastInfoRow: {
-    borderBottomWidth: 0,
-  },
+    lastInfoRow: {
+        borderBottomWidth: 0,
+    },
 
-  infoIcon: {
-    width: 42,
-    height: 42,
+    infoIcon: {
+        width: 42,
+        height: 42,
 
-    borderRadius: 14,
+        borderRadius: 14,
 
-    backgroundColor: appColors.surfaceLight,
+        backgroundColor: appColors.surfaceLight,
 
-    justifyContent: "center",
-    alignItems: "center",
+        justifyContent: "center",
+        alignItems: "center",
 
-    marginRight: 14,
-  },
+        marginRight: 14,
+    },
 
-  infoLabel: {
-    color: appColors.textDisabled,
-    fontSize: 12,
-    fontWeight: "600",
-  },
+    infoLabel: {
+        color: appColors.textDisabled,
+        fontSize: 12,
+        fontWeight: "600",
+    },
 
-  infoValue: {
-    color: appColors.text,
-    fontSize: 15,
-    fontWeight: "700",
-    marginTop: 3,
-  },
+    infoValue: {
+        color: appColors.text,
+        fontSize: 15,
+        fontWeight: "700",
+        marginTop: 3,
+    },
 
-  sectionTitle: {
-    color: appColors.text,
-    fontSize: 21,
-    fontWeight: "900",
-    marginTop: 30,
-  },
+    sectionTitle: {
+        color: appColors.text,
+        fontSize: 21,
+        fontWeight: "900",
+        marginTop: 30,
+    },
 
-  sectionSubtitle: {
-    color: appColors.textMuted,
-    fontSize: 13,
-    marginTop: 5,
-    marginBottom: 20,
-  },
+    sectionSubtitle: {
+        color: appColors.textMuted,
+        fontSize: 13,
+        marginTop: 5,
+        marginBottom: 20,
+    },
 
-  row: {
-    justifyContent: "space-between",
-  },
+    row: {
+        justifyContent: "space-between",
+    },
 });
