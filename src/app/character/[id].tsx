@@ -50,7 +50,12 @@ export default function CharacterDetailScreen() {
 
       setFavorite(savedAsFavorite);
     } catch (err) {
-      console.error(err);
+      if (__DEV__) {
+  console.log(
+    "No se pudo cargar el personaje:",
+    err
+  );
+}
       setError(true);
     } finally {
       setLoading(false);

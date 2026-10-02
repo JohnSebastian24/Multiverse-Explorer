@@ -2,10 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import { useState } from "react";
 import { appColors } from "../../constants/theme";
+import { Image } from "expo-image";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Keyboard,
   Pressable,
   StyleSheet,
@@ -24,7 +24,7 @@ import {
   translateStatus,
 } from "../../utils/translations";
 
-import { resolveCharacterSearch,} from "../../utils/searchAliases";
+import { resolveCharacterSearch, } from "../../utils/searchAliases";
 
 export default function SearchScreen() {
   const router = useRouter();
@@ -38,26 +38,26 @@ export default function SearchScreen() {
   const [error, setError] = useState(false);
 
   async function handleSearch() {
-  const text = query.trim();
+    const text = query.trim();
 
-  if (!text) {
-    return;
-  }
+    if (!text) {
+      return;
+    }
 
-  try {
-    Keyboard.dismiss();
+    try {
+      Keyboard.dismiss();
 
-    setLoading(true);
-    setError(false);
-    setSearched(true);
+      setLoading(true);
+      setError(false);
+      setSearched(true);
 
-    const apiSearch =
-      resolveCharacterSearch(text);
+      const apiSearch =
+        resolveCharacterSearch(text);
 
-    const data =
-      await searchCharacters(apiSearch);
+      const data =
+        await searchCharacters(apiSearch);
 
-    setResults(data);
+      setResults(data);
     } catch (err) {
       console.error(err);
 
@@ -141,35 +141,35 @@ export default function SearchScreen() {
       )}
 
       {!loading && error && (
-  <View style={styles.center}>
-    <Text style={styles.emptyIcon}>
-      🛸
-    </Text>
+        <View style={styles.center}>
+          <Text style={styles.emptyIcon}>
+            🛸
+          </Text>
 
-    <Text style={styles.emptyTitle}>
-      No pudimos conectar con esta dimensión
-    </Text>
+          <Text style={styles.emptyTitle}>
+            No pudimos conectar con esta dimensión
+          </Text>
 
-    <Text style={styles.emptyText}>
-      Revisa tu conexión e intenta nuevamente.
-    </Text>
+          <Text style={styles.emptyText}>
+            Revisa tu conexión e intenta nuevamente.
+          </Text>
 
-    <Pressable
-      style={styles.retryButton}
-      onPress={handleSearch}
-    >
-      <Ionicons
-        name="refresh"
-        size={18}
-        color={appColors.textDark}
-      />
+          <Pressable
+            style={styles.retryButton}
+            onPress={handleSearch}
+          >
+            <Ionicons
+              name="refresh"
+              size={18}
+              color={appColors.textDark}
+            />
 
-      <Text style={styles.retryButtonText}>
-        Reintentar
-      </Text>
-    </Pressable>
-  </View>
-)}
+            <Text style={styles.retryButtonText}>
+              Reintentar
+            </Text>
+          </Pressable>
+        </View>
+      )}
 
       {!loading &&
         !error &&
@@ -199,14 +199,23 @@ export default function SearchScreen() {
           renderItem={({ item }) => (
 
             <Pressable
-              style={styles.resultCard}
+              style={({ pressed }) => [
+                styles.resultCard,
+                pressed &&
+                styles.resultCardPressed,
+              ]}
               onPress={() =>
-                router.push(`/character/${item.id}` as Href)
+                router.push(
+                  `/character/${item.id}` as Href
+                )
               }
             >
               <Image
-                source={{ uri: item.image }}
+                source={item.image}
                 style={styles.image}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={200}
               />
 
               <View style={styles.resultInfo}>
@@ -262,14 +271,14 @@ const styles = StyleSheet.create({
   },
 
   header: {
-  width: "100%",
-  maxWidth: 760,
-  alignSelf: "center",
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
 
-  paddingHorizontal: 20,
-  paddingTop: 35,
-  paddingBottom: 15,
-},
+    paddingHorizontal: 20,
+    paddingTop: 35,
+    paddingBottom: 15,
+  },
 
   badge: {
     color: appColors.primary,
@@ -325,28 +334,28 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 
-retryButton: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
+  retryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
 
-  gap: 7,
+    gap: 7,
 
-  backgroundColor: appColors.primary,
+    backgroundColor: appColors.primary,
 
-  paddingHorizontal: 20,
-  paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
 
-  borderRadius: 14,
+    borderRadius: 14,
 
-  marginTop: 20,
-},
+    marginTop: 20,
+  },
 
-retryButtonText: {
-  color: appColors.textDark,
-  fontSize: 14,
-  fontWeight: "800",
-},
+  retryButtonText: {
+    color: appColors.textDark,
+    fontSize: 14,
+    fontWeight: "800",
+  },
 
   center: {
     flex: 1,
@@ -379,13 +388,23 @@ retryButtonText: {
   },
 
   results: {
-  width: "100%",
-  maxWidth: 760,
-  alignSelf: "center",
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
 
-  paddingHorizontal: 20,
-  paddingBottom: 30,
-},
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+  },
+
+  resultCardPressed: {
+    opacity: 0.82,
+
+    transform: [
+      {
+        scale: 0.99,
+      },
+    ],
+  },
 
   resultCard: {
     flexDirection: "row",

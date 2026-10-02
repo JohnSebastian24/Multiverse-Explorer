@@ -25,8 +25,6 @@ export default function HomeScreen() {
     // Referencia directa a la lista.
     const listRef = useRef<FlatList<Character>>(null);
 
-    useScrollToTop(listRef);
-
     // Bloqueo inmediato para evitar peticiones duplicadas
     // cuando se hace scroll muy rápido.
     const loadingMoreRef = useRef(false);

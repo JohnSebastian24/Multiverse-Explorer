@@ -27,7 +27,9 @@ const characterAliases: Record<string, string> = {
     "persona pajaro": "Birdperson",
     "hombre ave": "Birdperson",
     "bird person": "Birdperson",
-
+    "pajaro": "Birdperson",
+    "pájaro": "Birdperson",
+    
     // Pickle Rick
     "rick pepinillo": "Pickle Rick",
     "pepinillo rick": "Pickle Rick",

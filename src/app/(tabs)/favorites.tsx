@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Href, useFocusEffect, useRouter, } from "expo-router";
 import { useCallback, useState } from "react";
-import { appColors } from "../../constants/theme";
 import {
   FlatList,
   Pressable,
@@ -9,11 +8,12 @@ import {
   Text,
   View,
 } from "react-native";
+import { appColors } from "../../constants/theme";
 
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Character } from "../../services/rickAndMortyApi";
 import { getFavorites } from "../../services/favoritesStorage";
+import { Character } from "../../services/rickAndMortyApi";
 import { translateSpecies, translateStatus, } from "../../utils/translations";
 
 export default function FavoritesScreen() {
@@ -48,23 +48,19 @@ export default function FavoritesScreen() {
           styles.emptyContent,
         ]}
         ListHeaderComponent={
-          favorites.length > 0 ? (
-            <View style={styles.header}>
-              <Text style={styles.badge}>
-                PERSONAJES GUARDADOS
-              </Text>
+          <View style={styles.header}>
+            <Text style={styles.badge}>
+              PERSONAJES GUARDADOS
+            </Text>
 
-              <Text style={styles.title}>
-                Favoritos
-              </Text>
+            <Text style={styles.title}>
+              Favoritos
+            </Text>
 
-              <Text
-                style={styles.subtitle}
-              >
-                Tu colección personal del multiverso.
-              </Text>
-            </View>
-          ) : null
+            <Text style={styles.subtitle}>
+              Tu colección personal del multiverso.
+            </Text>
+          </View>
         }
         ListEmptyComponent={
           <View style={styles.empty}>
@@ -194,7 +190,8 @@ const styles = StyleSheet.create({
 
     flexGrow: 1,
 
-    // conserva aquí tus demás estilos
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
 
   header: {
@@ -238,14 +235,14 @@ const styles = StyleSheet.create({
   },
 
   cardPressed: {
-  opacity: 0.82,
+    opacity: 0.82,
 
-  transform: [
-    {
-      scale: 0.99,
-    },
-  ],
-},
+    transform: [
+      {
+        scale: 0.99,
+      },
+    ],
+  },
 
   image: {
     width: 82,
@@ -290,8 +287,13 @@ const styles = StyleSheet.create({
   },
 
   empty: {
+    flex: 1,
+
+    justifyContent: "center",
     alignItems: "center",
+
     paddingHorizontal: 30,
+    paddingBottom: 100,
   },
 
   emptyIcon: {

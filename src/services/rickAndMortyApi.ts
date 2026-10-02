@@ -96,6 +96,19 @@ async function fetchWithRetry(
       if (response.ok) {
         return response;
       }
+      if (response.status === 429) {
+  lastError = new Error(
+    "La API está recibiendo demasiadas solicitudes"
+  );
+
+  if (attempt < retries) {
+    await wait(
+      1500 * (attempt + 1)
+    );
+
+    continue;
+  }
+}
 
       /*
        * Un error 4xx normalmente no mejora
