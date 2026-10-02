@@ -293,7 +293,10 @@ export default function HomeScreen() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView
+            style={styles.container}
+            edges={["top", "left", "right"]}
+        >
             <FlatList
                 ref={listRef}
                 data={characters}
@@ -318,6 +321,23 @@ export default function HomeScreen() {
                 onEndReachedThreshold={0.35}
                 ListHeaderComponent={
                     <View style={styles.header}>
+                        <Pressable
+                            onPress={() =>
+                                router.push("/about" as Href)
+                            }
+                            hitSlop={10}
+                            style={({ pressed }) => [
+                                styles.aboutButton,
+                                pressed &&
+                                styles.aboutButtonPressed,
+                            ]}
+                        >
+                            <Ionicons
+                                name="information-circle-outline"
+                                size={25}
+                                color={appColors.primary}
+                            />
+                        </Pressable>
                         <Text style={styles.badge}>
                             BASE DE DATOS MULTIVERSAL
                         </Text>
@@ -531,14 +551,46 @@ const styles = StyleSheet.create({
         fontWeight: "800",
     },
 
-    listContent: {
-  width: "100%",
-  maxWidth: 760,
-  alignSelf: "center",
+    aboutButton: {
+        position: "absolute",
 
-  paddingHorizontal: 16,
-  paddingBottom: 100,
-},
+        top: 20,
+        right: 0,
+
+        width: 44,
+        height: 44,
+
+        borderRadius: 22,
+
+        backgroundColor: appColors.surface,
+
+        borderWidth: 1,
+        borderColor: appColors.border,
+
+        justifyContent: "center",
+        alignItems: "center",
+
+        zIndex: 5,
+    },
+
+    aboutButtonPressed: {
+        opacity: 0.7,
+
+        transform: [
+            {
+                scale: 0.94,
+            },
+        ],
+    },
+
+    listContent: {
+        width: "100%",
+        maxWidth: 760,
+        alignSelf: "center",
+
+        paddingHorizontal: 16,
+        paddingBottom: 100,
+    },
 
     header: {
         paddingTop: 25,

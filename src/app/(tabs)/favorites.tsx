@@ -36,7 +36,10 @@ export default function FavoritesScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      edges={["top", "left", "right"]}
+    >
       <FlatList
         data={favorites}
         keyExtractor={(item) =>
