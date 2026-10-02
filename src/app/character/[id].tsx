@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Href, useLocalSearchParams, useRouter, } from "expo-router";
 import { checkIsFavorite, toggleFavorite } from "../../services/favoritesStorage";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -215,42 +215,14 @@ export default function CharacterDetailScreen() {
               label="Episodios"
               value={`${character.episode.length} apariciones`}
               last
+              onPress={() =>
+                router.push(
+                  `/episodes/${character.id}` as Href
+                )
+              }
             />
           </View>
-          <Pressable
-            style={[
-              styles.favoriteButton,
-              favorite &&
-              styles.favoriteButtonActive,
-            ]}
-            onPress={handleFavorite}
-          >
-            <Ionicons
-              name={
-                favorite
-                  ? "heart"
-                  : "heart-outline"
-              }
-              size={22}
-              color={
-                favorite
-                  ? "#ffffff"
-                  : "#97ce4c"
-              }
-            />
 
-            <Text
-              style={[
-                styles.favoriteButtonText,
-                favorite &&
-                styles.favoriteButtonTextActive,
-              ]}
-            >
-              {favorite
-                ? "Quitar de favoritos"
-                : "Agregar a favoritos"}
-            </Text>
-          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -262,6 +234,7 @@ interface InfoRowProps {
   label: string;
   value: string;
   last?: boolean;
+  onPress?: () => void;
 }
 
 function InfoRow({
@@ -269,12 +242,18 @@ function InfoRow({
   label,
   value,
   last = false,
+  onPress,
 }: InfoRowProps) {
   return (
-    <View
-      style={[
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      style={({ pressed }) => [
         styles.infoRow,
         last && styles.lastInfoRow,
+        onPress &&
+        pressed &&
+        styles.infoRowPressed,
       ]}
     >
       <View style={styles.infoIcon}>
@@ -294,7 +273,15 @@ function InfoRow({
           {value}
         </Text>
       </View>
-    </View>
+
+      {onPress && (
+        <Ionicons
+          name="chevron-forward"
+          size={22}
+          color={appColors.textDisabled}
+        />
+      )}
+    </Pressable>
   );
 }
 
@@ -449,6 +436,10 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
   },
+
+  infoRowPressed: {
+  opacity: 0.65,
+},
 
   infoLabel: {
     color: appColors.textDisabled,
