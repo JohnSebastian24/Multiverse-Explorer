@@ -534,9 +534,13 @@ const styles = StyleSheet.create({
     },
 
     listContent: {
-        paddingHorizontal: 16,
-        paddingBottom: 100,
-    },
+  width: "100%",
+  maxWidth: 760,
+  alignSelf: "center",
+
+  paddingHorizontal: 16,
+  paddingBottom: 100,
+},
 
     header: {
         paddingTop: 25,

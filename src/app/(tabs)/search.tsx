@@ -235,10 +235,14 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 35,
-    paddingBottom: 15,
-  },
+  width: "100%",
+  maxWidth: 760,
+  alignSelf: "center",
+
+  paddingHorizontal: 20,
+  paddingTop: 35,
+  paddingBottom: 15,
+},
 
   badge: {
     color: appColors.primary,
@@ -325,9 +329,13 @@ const styles = StyleSheet.create({
   },
 
   results: {
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-  },
+  width: "100%",
+  maxWidth: 760,
+  alignSelf: "center",
+
+  paddingHorizontal: 20,
+  paddingBottom: 30,
+},
 
   resultCard: {
     flexDirection: "row",

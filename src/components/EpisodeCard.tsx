@@ -39,9 +39,12 @@ export default function EpisodeCard({
 
   return (
     <Pressable
-      style={styles.card}
-      onPress={onPress}
-    >
+  onPress={onPress}
+  style={({ pressed }) => [
+    styles.card,
+    pressed && styles.cardPressed,
+  ]}
+>
       <View style={styles.episodeIcon}>
         <Ionicons
           name="tv-outline"
@@ -90,6 +93,15 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
+
+cardPressed: {
+  opacity: 0.82,
+  transform: [
+    {
+      scale: 0.985,
+    },
+  ],
+},
 
   episodeIcon: {
     width: 48,

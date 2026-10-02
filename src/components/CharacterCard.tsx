@@ -22,9 +22,12 @@ export default function CharacterCard({
 
   return (
     <Pressable
-      style={styles.card}
-      onPress={onPress}
-    >
+  onPress={onPress}
+  style={({ pressed }) => [
+    styles.card,
+    pressed && styles.cardPressed,
+  ]}
+>
       <Image
         source={character.image}
         style={styles.characterImage}
@@ -84,6 +87,15 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     backgroundColor: appColors.surfaceLight,
   },
+
+  cardPressed: {
+  opacity: 0.82,
+  transform: [
+    {
+      scale: 0.98,
+    },
+  ],
+},
 
   cardContent: {
     padding: 12,
