@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Character, getCharacterById, } from "../../services/rickAndMortyApi";
 import { appColors } from "../../constants/theme";
+import TopNavigationButtons from "../../components/TopNavigationButtons";
 import {
   ActivityIndicator,
   Image,
@@ -61,17 +62,17 @@ export default function CharacterDetailScreen() {
       return;
     }
 
-    function handleBack() {
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.replace("/");
-      }
-    }
-    const newFavoriteState =
-      await toggleFavorite(character);
+    try {
+      const newFavoriteState =
+        await toggleFavorite(character);
 
-    setFavorite(newFavoriteState);
+      setFavorite(newFavoriteState);
+    } catch (error) {
+      console.log(
+        "No se pudo actualizar favoritos:",
+        error
+      );
+    }
   }
 
   useEffect(() => {
@@ -151,16 +152,6 @@ export default function CharacterDetailScreen() {
             style={styles.image}
           />
 
-          <Pressable
-            style={styles.backButton}
-            onPress={handleBack}
-          >
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={appColors.text}
-            />
-          </Pressable>
         </View>
 
         <View style={styles.content}>
@@ -223,8 +214,49 @@ export default function CharacterDetailScreen() {
             />
           </View>
 
+          <Pressable
+            style={[
+              styles.favoriteButton,
+              favorite &&
+              styles.favoriteButtonActive,
+            ]}
+            onPress={handleFavorite}
+          >
+            <Ionicons
+              name={
+                favorite
+                  ? "heart"
+                  : "heart-outline"
+              }
+              size={22}
+              color={
+                favorite
+                  ? appColors.text
+                  : appColors.primary
+              }
+            />
+
+            <Text
+              style={[
+                styles.favoriteButtonText,
+                favorite &&
+                styles.favoriteButtonTextActive,
+              ]}
+            >
+              {favorite
+                ? "Quitar de favoritos"
+                : "Agregar a favoritos"}
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
+
+      <TopNavigationButtons
+        onBack={handleBack}
+        onHome={() =>
+          router.replace("/")
+        }
+      />
     </SafeAreaView>
   );
 }
@@ -352,18 +384,6 @@ const styles = StyleSheet.create({
     backgroundColor: appColors.surfaceLight,
   },
 
-  backButton: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(9,14,23,0.8)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
   content: {
     padding: 22,
   },
@@ -438,8 +458,8 @@ const styles = StyleSheet.create({
   },
 
   infoRowPressed: {
-  opacity: 0.65,
-},
+    opacity: 0.65,
+  },
 
   infoLabel: {
     color: appColors.textDisabled,

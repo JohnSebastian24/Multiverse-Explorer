@@ -29,9 +29,10 @@ import CharacterCard from "../../components/CharacterCard";
 
 import { appColors } from "../../constants/theme";
 
-import FloatingBackButton from "../../components/FloatingBackButton";
-
 import ScrollTopButton from "../../components/ScrollTopButton";
+
+import TopNavigationButtons from "../../components/TopNavigationButtons";
+
 import {
     Character,
     Episode,
@@ -295,11 +296,12 @@ export default function EpisodeDetailScreen() {
                     />
                 )}
             />
-            <FloatingBackButton
-                visible={showFloatingButtons}
-                onPress={handleBack}
+            <TopNavigationButtons
+                onBack={handleBack}
+                onHome={() =>
+                    router.replace("/")
+                }
             />
-
             <ScrollTopButton
                 visible={showFloatingButtons}
                 onPress={scrollToTop}

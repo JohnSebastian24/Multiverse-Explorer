@@ -28,8 +28,8 @@ import { SafeAreaView, } from "react-native-safe-area-context";
 import EpisodeCard from "../../components/EpisodeCard";
 import ScrollTopButton from "../../components/ScrollTopButton";
 import { appColors } from "../../constants/theme";
-
 import { useScrollToTop } from "expo-router/react-navigation";
+import TopNavigationButtons from "../../components/TopNavigationButtons";
 import {
     Episode,
     extractIdsFromUrls,
@@ -231,17 +231,6 @@ export default function CharacterEpisodesScreen() {
                 }
                 ListHeaderComponent={
                     <View style={styles.header}>
-                        <Pressable
-                            style={styles.backButton}
-                            onPress={handleBack}
-                        >
-                            <Ionicons
-                                name="arrow-back"
-                                size={23}
-                                color={appColors.text}
-                            />
-                        </Pressable>
-
                         <Text style={styles.badge}>
                             GUÍA INTERDIMENSIONAL
                         </Text>
@@ -283,11 +272,18 @@ export default function CharacterEpisodesScreen() {
                     />
                 )}
             />
-            <ScrollTopButton
-                visible={showScrollTop}
-                onPress={scrollToTop}
-            />
-        </SafeAreaView>
+                  <TopNavigationButtons
+        onBack={handleBack}
+        onHome={() =>
+          router.replace("/")
+        }
+      />
+
+      <ScrollTopButton
+        visible={showScrollTop}
+        onPress={scrollToTop}
+      />
+    </SafeAreaView>
     );
 }
 
