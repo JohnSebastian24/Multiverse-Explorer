@@ -17,11 +17,11 @@ export default function TopNavigationButtons({
 
     return (
         <View
-            pointerEvents="box-none"
             style={[
                 styles.container,
                 {
                     top: insets.top + 10,
+                    pointerEvents: "box-none",
                 },
             ]}
         >
