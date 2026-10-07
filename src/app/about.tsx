@@ -49,7 +49,7 @@ export default function AboutScreen() {
                         </Text>
 
                         <Text style={styles.subtitle}>
-                            Rick & Morty Explorer
+                            Multiverse Explorer
                         </Text>
 
                         <Text style={styles.version}>
