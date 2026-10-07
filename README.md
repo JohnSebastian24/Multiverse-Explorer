@@ -1,30 +1,26 @@
 # 🌌 Multiverse Explorer
 
-Aplicación móvil desarrollada con **React Native, Expo y TypeScript** que consume la API pública de **Rick and Morty** para explorar personajes y episodios del multiverso.
+Aplicación multiplataforma desarrollada con **React Native, Expo y TypeScript** que consume la API pública de Rick and Morty para explorar personajes y episodios del multiverso.
 
-El proyecto fue desarrollado con fines académicos, buscando construir una experiencia móvil moderna, rápida y visualmente consistente a partir de una API REST pública.
+El proyecto fue desarrollado con fines académicos, aplicando consumo de API REST, navegación, persistencia local, manejo de errores y diseño responsive.
 
----
+## ✨ Características
 
-## 📱 Características
-
-- Exploración de personajes mediante scroll infinito.
-- Filtros por personajes vivos, muertos y estado desconocido.
-- Búsqueda de personajes por nombre.
-- Búsqueda asistida mediante algunos alias en español.
-- Información detallada de cada personaje.
-- Sistema de favoritos almacenados localmente.
-- Consulta de episodios en los que aparece cada personaje.
-- Información detallada de cada episodio.
-- Navegación desde episodios hacia sus personajes.
-- Navegación rápida hacia atrás, inicio y parte superior de listas extensas.
-- Manejo visual de errores de conexión.
-- Reintentos automáticos ante fallos temporales de la API.
-- Adaptación para dispositivos móviles y navegador web.
-- Pantalla Acerca de / información legal.
-- Caché de imágenes mediante `expo-image`.
-
----
+- Exploración de personajes.
+- Scroll infinito y paginación.
+- Filtros por estado.
+- Búsqueda por nombre.
+- Búsqueda asistida con algunos alias en español.
+- Detalle completo de personajes.
+- Favoritos persistentes mediante AsyncStorage.
+- Episodios asociados a cada personaje.
+- Detalle de episodios.
+- Personajes participantes en cada episodio.
+- Navegación entre personajes y episodios.
+- Manejo de errores y reintentos.
+- Caché de imágenes.
+- Interfaz adaptada para móvil y web.
+- Pantalla Acerca de e información del proyecto.
 
 ## 🛠️ Tecnologías
 
@@ -34,33 +30,19 @@ El proyecto fue desarrollado con fines académicos, buscando construir una exper
 - TypeScript
 - AsyncStorage
 - Expo Image
-- Rick and Morty REST API
-- Git
-- GitHub
+- Git y GitHub
 - Postman
+- The Rick and Morty API
 
----
+## 🌐 API REST
 
-## 🌐 API
-
-La aplicación consume la API pública:
-
-**The Rick and Morty API**
-
-Recurso principal:
+La aplicación consume:
 
 ```text
 https://rickandmortyapi.com/api
 ```
 
-Actualmente la aplicación utiliza principalmente los recursos:
-
-```text
-/character
-/episode
-```
-
-Ejemplos:
+Entre las peticiones utilizadas se encuentran:
 
 ```http
 GET /character
@@ -73,15 +55,13 @@ GET /episode/1
 GET /episode/1,2,3
 ```
 
-La aplicación utiliza únicamente operaciones de consulta mediante HTTP `GET`.
-
----
+La aplicación utiliza la API como fuente de consulta mediante peticiones HTTP `GET`.
 
 ## 🔎 Búsqueda asistida
 
 La API almacena los nombres de los personajes en su idioma original.
 
-Multiverse Explorer incorpora una pequeña capa de búsqueda asistida que permite reconocer algunos nombres escritos comúnmente en español.
+Multiverse Explorer añade una pequeña capa de búsqueda asistida para reconocer algunos términos comunes en español.
 
 Por ejemplo:
 
@@ -91,27 +71,21 @@ Señor pantalones de popó
 Mr. Poopybutthole
 ```
 
-El nombre oficial que se muestra en los resultados sigue siendo el proporcionado por la API.
-
----
+El resultado siempre conserva el nombre oficial entregado por la API.
 
 ## ❤️ Favoritos
 
-Los favoritos no se envían a un servidor.
+Los favoritos se almacenan localmente mediante **AsyncStorage**.
 
-Se almacenan localmente mediante:
+No se requiere:
 
-```text
-AsyncStorage
-```
+- cuenta de usuario;
+- inicio de sesión;
+- backend propio.
 
-Por esta razón, cada dispositivo mantiene sus propios personajes favoritos de manera independiente.
+Cada dispositivo conserva independientemente sus favoritos.
 
-La aplicación no requiere registro ni inicio de sesión.
-
----
-
-## 📂 Estructura principal
+## 📂 Arquitectura
 
 ```text
 src/
@@ -120,16 +94,9 @@ src/
 │   │   ├── index.tsx
 │   │   ├── search.tsx
 │   │   └── favorites.tsx
-│   │
 │   ├── character/
-│   │   └── [id].tsx
-│   │
-│   ├── episodes/
-│   │   └── [characterId].tsx
-│   │
 │   ├── episode/
-│   │   └── [id].tsx
-│   │
+│   ├── episodes/
 │   └── about.tsx
 │
 ├── components/
@@ -138,20 +105,14 @@ src/
 └── utils/
 ```
 
----
+La navegación se gestiona mediante **Expo Router**.
 
-## 🚀 Ejecutar el proyecto
+## 🚀 Ejecutar localmente
 
-### Requisitos
-
-- Node.js
-- npm
-- Expo
-
-Clonar el repositorio:
+Clonar:
 
 ```bash
-git clone URL_DEL_REPOSITORIO
+git clone https://github.com/JohnSebastian24/multiverse-explorer.git
 ```
 
 Entrar al proyecto:
@@ -172,61 +133,43 @@ Iniciar Expo:
 npx expo start
 ```
 
-Si un dispositivo físico tiene problemas para conectarse por la red local:
+En caso de problemas con la conexión LAN:
 
 ```bash
 npx expo start --tunnel
 ```
 
----
+## 🌐 Demo web
 
-## 📱 Plataformas probadas
+Puedes probar Multiverse Explorer directamente en:
 
-- iOS mediante Expo Go
-- Web
-- Android: versión instalable mediante build de Expo/EAS
+https://multiverse-explorer.expo.app/
 
----
+## 🧪 Postman
 
-## 🧪 Pruebas de API
+Las principales peticiones de la API fueron verificadas mediante Postman:
 
-Las peticiones principales fueron verificadas adicionalmente mediante **Postman**.
-
-Se probaron consultas de:
-
-```text
-Personajes
-Filtros por estado
-Búsqueda por nombre
-Personajes por ID
-Episodios
-Episodios por ID
-Consultas múltiples de episodios
-```
-
----
+- listado de personajes;
+- filtros;
+- búsqueda;
+- personaje por ID;
+- listado de episodios;
+- episodio por ID;
+- consulta múltiple de episodios.
 
 ## 🎨 Identidad visual
 
-La aplicación utiliza una interfaz oscura inspirada en el concepto de dimensiones y portales.
+**Multiverse Explorer — v1.0.0**
 
-Colores principales:
+Paleta principal:
 
 ```text
-Fondo:     #090e17
-Verde:     #97ce4c
-Cyan:      #00b5cc
+Fondo    #090e17
+Verde    #97ce4c
+Cyan     #00b5cc
 ```
 
-Nombre del proyecto:
-
-**Multiverse Explorer**
-
-Versión:
-
-**1.0.0**
-
----
+La identidad está inspirada en portales y exploración interdimensional.
 
 ## 👨‍💻 Autor
 
@@ -236,14 +179,12 @@ Desarrollado por:
 
 Proyecto académico — 2026.
 
----
-
 ## ⚖️ Aviso
 
 Multiverse Explorer es una aplicación no oficial desarrollada con fines académicos y educativos.
 
-Este proyecto no está afiliado, patrocinado ni respaldado oficialmente por Adult Swim ni por los responsables de la franquicia Rick and Morty.
+El proyecto no está afiliado ni patrocinado oficialmente por Adult Swim ni por los responsables de la franquicia Rick and Morty.
 
-Los nombres, imágenes, personajes y demás contenido relacionado con Rick and Morty pertenecen a sus respectivos propietarios.
+Los nombres, personajes, imágenes y demás contenido relacionado pertenecen a sus respectivos propietarios.
 
-Los datos utilizados por la aplicación son proporcionados por **The Rick and Morty API**.
+Los datos mostrados por la aplicación son proporcionados por The Rick and Morty API.
