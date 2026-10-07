@@ -1,56 +1,249 @@
-# Welcome to your Expo app 👋
+# 🌌 Multiverse Explorer
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación móvil desarrollada con **React Native, Expo y TypeScript** que consume la API pública de **Rick and Morty** para explorar personajes y episodios del multiverso.
 
-## Get started
+El proyecto fue desarrollado con fines académicos, buscando construir una experiencia móvil moderna, rápida y visualmente consistente a partir de una API REST pública.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 📱 Características
 
-2. Start the app
+- Exploración de personajes mediante scroll infinito.
+- Filtros por personajes vivos, muertos y estado desconocido.
+- Búsqueda de personajes por nombre.
+- Búsqueda asistida mediante algunos alias en español.
+- Información detallada de cada personaje.
+- Sistema de favoritos almacenados localmente.
+- Consulta de episodios en los que aparece cada personaje.
+- Información detallada de cada episodio.
+- Navegación desde episodios hacia sus personajes.
+- Navegación rápida hacia atrás, inicio y parte superior de listas extensas.
+- Manejo visual de errores de conexión.
+- Reintentos automáticos ante fallos temporales de la API.
+- Adaptación para dispositivos móviles y navegador web.
+- Pantalla Acerca de / información legal.
+- Caché de imágenes mediante `expo-image`.
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🛠️ Tecnologías
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- React Native
+- Expo
+- Expo Router
+- TypeScript
+- AsyncStorage
+- Expo Image
+- Rick and Morty REST API
+- Git
+- GitHub
+- Postman
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 🌐 API
 
-When you're ready, run:
+La aplicación consume la API pública:
 
-```bash
-npm run reset-project
+**The Rick and Morty API**
+
+Recurso principal:
+
+```text
+https://rickandmortyapi.com/api
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Actualmente la aplicación utiliza principalmente los recursos:
 
-### Other setup steps
+```text
+/character
+/episode
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Ejemplos:
 
-## Learn more
+```http
+GET /character
+GET /character/1
+GET /character?status=alive
+GET /character?name=rick
 
-To learn more about developing your project with Expo, look at the following resources:
+GET /episode
+GET /episode/1
+GET /episode/1,2,3
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+La aplicación utiliza únicamente operaciones de consulta mediante HTTP `GET`.
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## 🔎 Búsqueda asistida
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+La API almacena los nombres de los personajes en su idioma original.
+
+Multiverse Explorer incorpora una pequeña capa de búsqueda asistida que permite reconocer algunos nombres escritos comúnmente en español.
+
+Por ejemplo:
+
+```text
+Señor pantalones de popó
+        ↓
+Mr. Poopybutthole
+```
+
+El nombre oficial que se muestra en los resultados sigue siendo el proporcionado por la API.
+
+---
+
+## ❤️ Favoritos
+
+Los favoritos no se envían a un servidor.
+
+Se almacenan localmente mediante:
+
+```text
+AsyncStorage
+```
+
+Por esta razón, cada dispositivo mantiene sus propios personajes favoritos de manera independiente.
+
+La aplicación no requiere registro ni inicio de sesión.
+
+---
+
+## 📂 Estructura principal
+
+```text
+src/
+├── app/
+│   ├── (tabs)/
+│   │   ├── index.tsx
+│   │   ├── search.tsx
+│   │   └── favorites.tsx
+│   │
+│   ├── character/
+│   │   └── [id].tsx
+│   │
+│   ├── episodes/
+│   │   └── [characterId].tsx
+│   │
+│   ├── episode/
+│   │   └── [id].tsx
+│   │
+│   └── about.tsx
+│
+├── components/
+├── constants/
+├── services/
+└── utils/
+```
+
+---
+
+## 🚀 Ejecutar el proyecto
+
+### Requisitos
+
+- Node.js
+- npm
+- Expo
+
+Clonar el repositorio:
+
+```bash
+git clone URL_DEL_REPOSITORIO
+```
+
+Entrar al proyecto:
+
+```bash
+cd multiverse-explorer
+```
+
+Instalar dependencias:
+
+```bash
+npm install
+```
+
+Iniciar Expo:
+
+```bash
+npx expo start
+```
+
+Si un dispositivo físico tiene problemas para conectarse por la red local:
+
+```bash
+npx expo start --tunnel
+```
+
+---
+
+## 📱 Plataformas probadas
+
+- iOS mediante Expo Go
+- Web
+- Android: versión instalable mediante build de Expo/EAS
+
+---
+
+## 🧪 Pruebas de API
+
+Las peticiones principales fueron verificadas adicionalmente mediante **Postman**.
+
+Se probaron consultas de:
+
+```text
+Personajes
+Filtros por estado
+Búsqueda por nombre
+Personajes por ID
+Episodios
+Episodios por ID
+Consultas múltiples de episodios
+```
+
+---
+
+## 🎨 Identidad visual
+
+La aplicación utiliza una interfaz oscura inspirada en el concepto de dimensiones y portales.
+
+Colores principales:
+
+```text
+Fondo:     #090e17
+Verde:     #97ce4c
+Cyan:      #00b5cc
+```
+
+Nombre del proyecto:
+
+**Multiverse Explorer**
+
+Versión:
+
+**1.0.0**
+
+---
+
+## 👨‍💻 Autor
+
+Desarrollado por:
+
+**JOHN MUÑOZ**
+
+Proyecto académico — 2026.
+
+---
+
+## ⚖️ Aviso
+
+Multiverse Explorer es una aplicación no oficial desarrollada con fines académicos y educativos.
+
+Este proyecto no está afiliado, patrocinado ni respaldado oficialmente por Adult Swim ni por los responsables de la franquicia Rick and Morty.
+
+Los nombres, imágenes, personajes y demás contenido relacionado con Rick and Morty pertenecen a sus respectivos propietarios.
+
+Los datos utilizados por la aplicación son proporcionados por **The Rick and Morty API**.
