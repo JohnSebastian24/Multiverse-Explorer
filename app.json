@@ -11,6 +11,7 @@
       "icon": "./assets/images/icon.png"
     },
     "android": {
+      "package": "com.johnsebastian24.multiverseexplorer",
       "adaptiveIcon": {
         "backgroundColor": "#090e17",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
