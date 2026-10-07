@@ -139,6 +139,12 @@ En caso de problemas con la conexión LAN:
 npx expo start --tunnel
 ```
 
+## 🌐 Demo web
+
+Puedes probar Multiverse Explorer directamente en:
+
+https://multiverse-explorer.expo.app/
+
 ## 🧪 Postman
 
 Las principales peticiones de la API fueron verificadas mediante Postman:
